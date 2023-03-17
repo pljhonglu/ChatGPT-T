@@ -100,47 +100,35 @@ async function onConversation() {
   try {
     let lastText = ''
     const fetchChatAPIOnce = async () => {
-      await fetchChatAPIProcess<Chat.ConversationResponse>({
-        prompt: message,
-        options,
-        signal: controller.signal,
-        onDownloadProgress: ({ event }) => {
-          const xhr = event.target
-          const { responseText } = xhr
-          // Always process the final line
-          const lastIndex = responseText.lastIndexOf('\n')
-          let chunk = responseText
-          if (lastIndex !== -1)
-            chunk = responseText.substring(lastIndex)
-          try {
-            const data = JSON.parse(chunk)
-            updateChat(
-              +uuid,
-              dataSources.value.length - 1,
-              {
-                dateTime: new Date().toLocaleString(),
-                text: lastText + data.text ?? '',
-                inversion: false,
-                error: false,
-                loading: false,
-                conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-                requestOptions: { prompt: message, options: { ...options } },
-              },
-            )
+      await fetchChatAPIProcess(message, options, controller.signal, (detail: string, finish_reason: string, options: Chat.ConversationRequest | undefined) => {
+        try {
+          lastText = lastText + detail ?? ''
+          updateChat(
+            +uuid,
+            dataSources.value.length - 1,
+            {
+              dateTime: new Date().toLocaleString(),
+              text: lastText,
+              inversion: false,
+              error: false,
+              loading: false,
+              conversationOptions: { conversationId: options?.conversationId, parentMessageId: options?.parentMessageId },
+              requestOptions: { prompt: message, options: { ...options } },
+            },
+          )
 
-            if (openLongReply && data.detail.choices[0].finish_reason === 'length') {
-              options.parentMessageId = data.id
-              lastText = data.text
-              message = ''
-              return fetchChatAPIOnce()
-            }
-
-            scrollToBottom()
+          if (openLongReply && finish_reason === 'length') {
+            // options.parentMessageId = data.id
+            // lastText = detail
+            message = ''
+            return fetchChatAPIOnce()
           }
-          catch (error) {
+
+          scrollToBottom()
+        }
+        catch (error) {
           //
-          }
-        },
+        }
       })
     }
 
@@ -230,37 +218,30 @@ async function onRegenerate(index: number) {
   try {
     let lastText = ''
     const fetchChatAPIOnce = async () => {
-      await fetchChatAPIProcess<Chat.ConversationResponse>({
-        prompt: message,
+      await fetchChatAPIProcess(
+        message,
         options,
-        signal: controller.signal,
-        onDownloadProgress: ({ event }) => {
-          const xhr = event.target
-          const { responseText } = xhr
-          // Always process the final line
-          const lastIndex = responseText.lastIndexOf('\n')
-          let chunk = responseText
-          if (lastIndex !== -1)
-            chunk = responseText.substring(lastIndex)
+        controller.signal,
+        (detail: string, finish_reason: string, options: Chat.ConversationRequest | undefined) => {
           try {
-            const data = JSON.parse(chunk)
+            lastText = lastText + detail ?? ''
             updateChat(
               +uuid,
               index,
               {
                 dateTime: new Date().toLocaleString(),
-                text: lastText + data.text ?? '',
+                text: lastText,
                 inversion: false,
                 error: false,
                 loading: false,
-                conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
+                conversationOptions: { conversationId: options?.conversationId, parentMessageId: options?.parentMessageId },
                 requestOptions: { prompt: message, ...options },
               },
             )
 
-            if (openLongReply && data.detail.choices[0].finish_reason === 'length') {
-              options.parentMessageId = data.id
-              lastText = data.text
+            if (openLongReply && finish_reason === 'length') {
+              // options.parentMessageId = data.id
+              // lastText = lastText
               message = ''
               return fetchChatAPIOnce()
             }
@@ -268,8 +249,7 @@ async function onRegenerate(index: number) {
           catch (error) {
             //
           }
-        },
-      })
+        })
     }
     await fetchChatAPIOnce()
   }

@@ -28,18 +28,9 @@ declare namespace Chat {
 	}
 
 	interface ConversationResponse {
-		conversationId: string
-		detail: {
-			choices: { finish_reason: string; index: number; logprobs: any; text: string }[]
-			created: number
-			id: string
-			model: string
-			object: string
-			usage: { completion_tokens: number; prompt_tokens: number; total_tokens: number }
-		}
-		id: string
-		parentMessageId: string
-		role: string
-		text: string
+		options: ConversationRequest,
+		detail: string,
+		role: string,
+		finish_reason: string,
 	}
 }
