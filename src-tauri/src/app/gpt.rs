@@ -1,10 +1,9 @@
-use tauri::{AppHandle, Manager, Runtime, Window};
+use tauri::{AppHandle, Manager};
 use reqwest;
-use eventsource_stream::{Eventsource, EventStream, EventStreamError};
+use eventsource_stream::{Eventsource, EventStreamError};
 use serde_json::{json, Value};
 use serde::{ser::Serializer, Serialize, Deserialize};
 use futures::{TryStreamExt};
-use tokio::sync::mpsc::error;
 use std::{collections::HashMap};
 
 type Result<T> = std::result::Result<T, Error>;
@@ -34,6 +33,7 @@ impl Serialize for Error {
 pub struct ProgressPayload {
     pub id: u64,
     pub detail: String,
+    pub role: String,
     pub finish_reason: String,
 }
 
@@ -54,6 +54,7 @@ pub async fn fetch_chat_api(
     messages: Vec<HashMap<String, String>>,
     temperature: f32
 ) -> Result<u64> {
+    // https://platform.openai.com/docs/guides/chat/introduction
     let url = "https://api.openai.com/v1/chat/completions";
     let model = "gpt-3.5-turbo";
     let data = json!({
@@ -75,18 +76,19 @@ pub async fn fetch_chat_api(
     while let Some(chunk) = stream.try_next().await? {
         let chunk = chunk.data;
         if chunk == "[DONE]" {
-            let role = String::from("");
             let content = String::from("");
+            let role = String::from("");
             let finish_reason = String::from("");
-            let progress = ProgressPayload {id, detail:content, finish_reason};
+            let progress = ProgressPayload {id, detail:content, role, finish_reason};
             progress.emit_finished(&handle);
             break;
         } else {
             let object:Value = serde_json::from_str(&chunk)?;
             let delta = &object["choices"][0]["delta"];
             let content = String::from(delta["content"].as_str().unwrap_or(""));
+            let role = String::from(delta["role"].as_str().unwrap_or(""));
             let finish_reason = String::from(object["finish_reason"].as_str().unwrap_or(""));
-            let progress = ProgressPayload {id, detail:content, finish_reason};
+            let progress = ProgressPayload {id, detail:content, role, finish_reason};
             progress.emit_progress(&handle);
         }
     }

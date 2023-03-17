@@ -15,10 +15,11 @@ import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useChatStore, usePromptStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
+// import { ChatLayout } from './layout'
 
 let controller = new AbortController()
 
-const openLongReply = import.meta.env.VITE_GLOB_OPEN_LONG_REPLY === 'true'
+// const openLongReply = import.meta.env.VITE_GLOB_OPEN_LONG_REPLY === 'true'
 
 const route = useRoute()
 const dialog = useDialog()
@@ -36,7 +37,7 @@ const { usingContext, toggleUsingContext } = useUsingContext()
 const { uuid } = route.params as { uuid: string }
 
 const dataSources = computed(() => chatStore.getChatByUuid(+uuid))
-const conversationList = computed(() => dataSources.value.filter(item => (!item.inversion && !item.error)))
+// const conversationList = computed(() => dataSources.value.filter(item => (!item.inversion && !item.error)))
 
 const prompt = ref<string>('')
 const loading = ref<boolean>(false)
@@ -51,7 +52,7 @@ function handleSubmit() {
 }
 
 async function onConversation() {
-  let message = prompt.value
+  const message = prompt.value
 
   if (loading.value)
     return
@@ -68,21 +69,14 @@ async function onConversation() {
       text: message,
       inversion: true,
       error: false,
-      conversationOptions: null,
-      requestOptions: { prompt: message, options: null },
+      requestOptions: { },
     },
   )
   scrollToBottom()
 
   loading.value = true
   prompt.value = ''
-
-  let options: Chat.ConversationRequest = {}
-  const lastContext = conversationList.value[conversationList.value.length - 1]?.conversationOptions
-
-  if (lastContext && usingContext.value)
-    options = { ...lastContext }
-
+  const messages: Chat.RequestMessage[] = [{ role: 'user', content: message }]
   addChat(
     +uuid,
     {
@@ -91,8 +85,7 @@ async function onConversation() {
       loading: true,
       inversion: false,
       error: false,
-      conversationOptions: null,
-      requestOptions: { prompt: message, options: { ...options } },
+      requestOptions: { messages },
     },
   )
   scrollToBottom()
@@ -100,7 +93,7 @@ async function onConversation() {
   try {
     let lastText = ''
     const fetchChatAPIOnce = async () => {
-      await fetchChatAPIProcess(message, options, controller.signal, (detail: string, finish_reason: string, options: Chat.ConversationRequest | undefined) => {
+      await fetchChatAPIProcess(messages, (detail: string, _: string) => {
         try {
           lastText = lastText + detail ?? ''
           updateChat(
@@ -112,24 +105,15 @@ async function onConversation() {
               inversion: false,
               error: false,
               loading: false,
-              conversationOptions: { conversationId: options?.conversationId, parentMessageId: options?.parentMessageId },
-              requestOptions: { prompt: message, options: { ...options } },
+              requestOptions: { messages },
             },
           )
-
-          if (openLongReply && finish_reason === 'length') {
-            // options.parentMessageId = data.id
-            // lastText = detail
-            message = ''
-            return fetchChatAPIOnce()
-          }
-
           scrollToBottom()
         }
         catch (error) {
           //
         }
-      })
+      }, controller.signal)
     }
 
     await fetchChatAPIOnce()
@@ -173,8 +157,7 @@ async function onConversation() {
         inversion: false,
         error: true,
         loading: false,
-        conversationOptions: null,
-        requestOptions: { prompt: message, options: { ...options } },
+        requestOptions: { messages },
       },
     )
     scrollToBottom()
@@ -189,15 +172,11 @@ async function onRegenerate(index: number) {
     return
 
   controller = new AbortController()
-
   const { requestOptions } = dataSources.value[index]
 
-  let message = requestOptions?.prompt ?? ''
-
-  let options: Chat.ConversationRequest = {}
-
-  if (requestOptions.options)
-    options = { ...requestOptions.options }
+  const messages = requestOptions?.messages
+  if (!messages || messages.length === 0)
+    return
 
   loading.value = true
 
@@ -210,8 +189,7 @@ async function onRegenerate(index: number) {
       inversion: false,
       error: false,
       loading: true,
-      conversationOptions: null,
-      requestOptions: { prompt: message, ...options },
+      requestOptions: { messages },
     },
   )
 
@@ -219,10 +197,8 @@ async function onRegenerate(index: number) {
     let lastText = ''
     const fetchChatAPIOnce = async () => {
       await fetchChatAPIProcess(
-        message,
-        options,
-        controller.signal,
-        (detail: string, finish_reason: string, options: Chat.ConversationRequest | undefined) => {
+        messages!,
+        (detail: string, _: string) => {
           try {
             lastText = lastText + detail ?? ''
             updateChat(
@@ -234,22 +210,14 @@ async function onRegenerate(index: number) {
                 inversion: false,
                 error: false,
                 loading: false,
-                conversationOptions: { conversationId: options?.conversationId, parentMessageId: options?.parentMessageId },
-                requestOptions: { prompt: message, ...options },
+                requestOptions: { messages },
               },
             )
-
-            if (openLongReply && finish_reason === 'length') {
-              // options.parentMessageId = data.id
-              // lastText = lastText
-              message = ''
-              return fetchChatAPIOnce()
-            }
           }
           catch (error) {
             //
           }
-        })
+        }, controller.signal)
     }
     await fetchChatAPIOnce()
   }
@@ -276,8 +244,7 @@ async function onRegenerate(index: number) {
         inversion: false,
         error: true,
         loading: false,
-        conversationOptions: null,
-        requestOptions: { prompt: message, ...options },
+        requestOptions: { messages },
       },
     )
   }

@@ -6,8 +6,7 @@ declare namespace Chat {
 		inversion?: boolean
 		error?: boolean
 		loading?: boolean
-		conversationOptions?: ConversationRequest | null
-		requestOptions: { prompt: string; options?: ConversationRequest | null }
+		requestOptions: { messages?: RequestMessage[]; }
 	}
 
 	interface History {
@@ -22,15 +21,20 @@ declare namespace Chat {
 		chat: { uuid: number; data: Chat[] }[]
 	}
 
-	interface ConversationRequest {
-		conversationId?: string
-		parentMessageId?: string
+	interface RequestMessage {
+		role: string
+		content: string
 	}
 
-	interface ConversationResponse {
-		options: ConversationRequest,
-		detail: string,
-		role: string,
-		finish_reason: string,
-	}
+	// interface ConversationRequest {
+	// 	conversationId?: string
+	// 	parentMessageId?: string
+	// }
+
+	// interface ConversationResponse {
+	// 	options: ConversationRequest,
+	// 	detail: string,
+	// 	role: string,
+	// 	finish_reason: string,
+	// }
 }

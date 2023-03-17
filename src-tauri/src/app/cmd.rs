@@ -1,11 +1,5 @@
-use std::{fs::{self}, collections::HashMap, path::PathBuf,};
+use std::{fs::{self}, path::PathBuf,};
 use tauri::{AppHandle, Manager};
-
-use reqwest;
-use serde_json::json;
-use futures::{StreamExt, future::ok};
-use eventsource_stream::{Eventsource};
-use serde_json::Value;
 
 #[tauri::command]
 pub fn download(app: AppHandle, name: String, blob: Vec<u8>) {

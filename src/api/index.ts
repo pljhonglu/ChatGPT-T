@@ -6,6 +6,7 @@ interface ProgressPayload {
   id: number
   detail: string
   finish_reason: string
+  role: string
 }
 
 type ProgressHandler = (payload: ProgressPayload) => void
@@ -33,10 +34,9 @@ async function listenToEventIfNeeded(): Promise<void> {
 }
 
 export async function fetchChatAPIProcess<T = any>(
-  prompt: string,
-  options?: T,
+  messages: Chat.RequestMessage[],
+  progressHandler?: (detail: string, role: string) => void,
   signal?: GenericAbortSignal,
-  progressHandler?: (detail: string, finish_reason: string, options: T | undefined) => void,
 ) {
   const ids = new Uint32Array(1)
   window.crypto.getRandomValues(ids)
@@ -44,7 +44,7 @@ export async function fetchChatAPIProcess<T = any>(
 
   if (progressHandler != null) {
     handlers.set(id, (payload) => {
-      progressHandler(payload.detail, payload.finish_reason, options)
+      progressHandler(payload.detail, payload.role)
     })
   }
   await listenToEventIfNeeded()
@@ -57,47 +57,16 @@ export async function fetchChatAPIProcess<T = any>(
 
   await invoke('fetch_chat_api', {
     id,
-    messages: [{
-      role: 'user',
-      content: prompt,
-    }],
+    messages,
     temperature: 0.6,
-    options: JSON.stringify(options),
   })
 }
-
-// export function fetchChatAPI<T = any>(
-//   prompt: string,
-//   options?: { conversationId?: string; parentMessageId?: string },
-//   signal?: GenericAbortSignal,
-// ) {
-//   return post<T>({
-//     url: '/chat',
-//     data: { prompt, options },
-//     signal,
-//   })
-// }
 
 export function fetchChatConfig<T = any>() {
   return post<T>({
     url: '/config',
   })
 }
-
-// export function fetchChatAPIProcess<T = any>(
-//   params: {
-//     prompt: string
-//     options?: { conversationId?: string; parentMessageId?: string }
-//     signal?: GenericAbortSignal
-//     onDownloadProgress?: (progressEvent: AxiosProgressEvent) => void },
-// ) {
-//   return post<T>({
-//     url: '/chat-process',
-//     data: { prompt: params.prompt, options: params.options },
-//     signal: params.signal,
-//     onDownloadProgress: params.onDownloadProgress,
-//   })
-// }
 
 export function fetchSession<T>() {
   return post<T>({
