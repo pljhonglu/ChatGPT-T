@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "dev:fe": "vite",
-    "build:fe": "run-p type-check build-only",
+    "build:fe": "run-p type-check build-only:fe",
     "build": "tauri build",
     "preview:fe": "vite preview",
     "build-only:fe": "vite build",
