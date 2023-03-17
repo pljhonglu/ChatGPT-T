@@ -81,23 +81,23 @@ jobs:
         with:
           name: artifacts-${{ matrix.arch }}
           path: |
-            ./target/${{ matrix.target }}/release/bundle/appimage/**.AppImage.*
-            ./target/${{ matrix.target }}/release/bundle/deb/**.deb
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/appimage/**.AppImage.*
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/deb/**.deb
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'macos-latest'
         with:
           name: artifacts-${{ matrix.arch }}
           path: |
-            ./target/${{ matrix.target }}/release/bundle/dmg/**.dmg
-            ./target/${{ matrix.target }}/release/bundle/macos/**.app.*
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/dmg/**.dmg
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/macos/**.app.*
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'windows-latest'
         with:
           name: artifacts-${{ matrix.arch }}
           path: |
-            ./target/${{ matrix.target }}/release/bundle/msi/**
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/msi/**
 
   release-chatgpt:
     needs: build-chatgpt
