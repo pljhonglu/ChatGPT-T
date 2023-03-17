@@ -127,21 +127,21 @@ jobs:
 
       - name: Rename artifacts
         run: |
-          mv "artifacts/aarch64/dmg/ChatGPT_${{ env.version }}_aarch64.dmg" "artifacts/ChatGPT_${{ env.version }}_macos_aarch64.dmg"
-          mv "artifacts/aarch64/macos/ChatGPT.app.tar.gz" "artifacts/ChatGPT_${{ env.version }}_macos_aarch64.app.tar.gz"
-          mv "artifacts/aarch64/macos/ChatGPT.app.tar.gz.sig" "artifacts/ChatGPT_${{ env.version }}_macos_aarch64.app.tar.gz.sig"
+          mv "artifacts/aarch64/dmg/ChatGPT-Tauri_${{ env.version }}_aarch64.dmg" "artifacts/ChatGPT-Tauri_${{ env.version }}_macos_aarch64.dmg"
+          mv "artifacts/aarch64/macos/ChatGPT-Tauri.app.tar.gz" "artifacts/ChatGPT-Tauri_${{ env.version }}_macos_aarch64.app.tar.gz"
+          mv "artifacts/aarch64/macos/ChatGPT-Tauri.app.tar.gz.sig" "artifacts/ChatGPT-Tauri_${{ env.version }}_macos_aarch64.app.tar.gz.sig"
 
-          mv "artifacts/x86_64/dmg/ChatGPT_${{ env.version }}_x64.dmg" "artifacts/ChatGPT_${{ env.version }}_macos_x86_64.dmg"
-          mv "artifacts/x86_64/macos/ChatGPT.app.tar.gz" "artifacts/ChatGPT_${{ env.version }}_macos_x86_64.app.tar.gz"
-          mv "artifacts/x86_64/macos/ChatGPT.app.tar.gz.sig" "artifacts/ChatGPT_${{ env.version }}_macos_x86_64.app.tar.gz.sig"
+          mv "artifacts/x86_64/dmg/ChatGPT-Tauri_${{ env.version }}_x64.dmg" "artifacts/ChatGPT-Tauri_${{ env.version }}_macos_x86_64.dmg"
+          mv "artifacts/x86_64/macos/ChatGPT-Tauri.app.tar.gz" "artifacts/ChatGPT-Tauri_${{ env.version }}_macos_x86_64.app.tar.gz"
+          mv "artifacts/x86_64/macos/ChatGPT-Tauri.app.tar.gz.sig" "artifacts/ChatGPT-Tauri_${{ env.version }}_macos_x86_64.app.tar.gz.sig"
 
-          mv "artifacts/x86_64/deb/chat-gpt_${{ env.version }}_amd64.deb" "artifacts/x86_64/deb/ChatGPT_${{ env.version }}_linux_x86_64.deb"
-          mv "artifacts/x86_64/appimage/chat-gpt_${{ env.version }}_amd64.AppImage.tar.gz" "artifacts/ChatGPT_${{ env.version }}_linux_x86_64.AppImage.tar.gz"
-          mv "artifacts/x86_64/appimage/chat-gpt_${{ env.version }}_amd64.AppImage.tar.gz.sig" "artifacts/ChatGPT_${{ env.version }}_linux_x86_64.AppImage.tar.gz.sig"
+          mv "artifacts/x86_64/deb/chat-gpt-tauri_${{ env.version }}_amd64.deb" "artifacts/x86_64/deb/ChatGPT-Tauri_${{ env.version }}_linux_x86_64.deb"
+          mv "artifacts/x86_64/appimage/chat-gpt-tauri_${{ env.version }}_amd64.AppImage.tar.gz" "artifacts/ChatGPT-Tauri_${{ env.version }}_linux_x86_64.AppImage.tar.gz"
+          mv "artifacts/x86_64/appimage/chat-gpt-tauri_${{ env.version }}_amd64.AppImage.tar.gz.sig" "artifacts/ChatGPT-Tauri_${{ env.version }}_linux_x86_64.AppImage.tar.gz.sig"
 
-          mv "artifacts/x86_64/ChatGPT_${{ env.version }}_x64_en-US.msi" "artifacts/ChatGPT_${{ env.version }}_windows_x86_64.msi"
-          mv "artifacts/x86_64/ChatGPT_${{ env.version }}_x64_en-US.msi.zip" "artifacts/ChatGPT_${{ env.version }}_windows_x86_64.msi.zip"
-          mv "artifacts/x86_64/ChatGPT_${{ env.version }}_x64_en-US.msi.zip.sig" "artifacts/ChatGPT_${{ env.version }}_windows_x86_64.msi.zip.sig"
+          mv "artifacts/x86_64/ChatGPT-Tauri_${{ env.version }}_x64_en-US.msi" "artifacts/ChatGPT-Tauri_${{ env.version }}_windows_x86_64.msi"
+          mv "artifacts/x86_64/ChatGPT-Tauri_${{ env.version }}_x64_en-US.msi.zip" "artifacts/ChatGPT-Tauri_${{ env.version }}_windows_x86_64.msi.zip"
+          mv "artifacts/x86_64/ChatGPT-Tauri_${{ env.version }}_x64_en-US.msi.zip.sig" "artifacts/ChatGPT-Tauri_${{ env.version }}_windows_x86_64.msi.zip.sig"
 
       - name: Create Release
         uses: softprops/action-gh-release@master
