@@ -55,7 +55,7 @@
         "icons/icon.ico"
       ],
       "identifier": "me.honglu.chatgpt",
-      "longDescription": "",
+      "longDescription": "ChatGPT Desktop Application",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -64,7 +64,7 @@
         "signingIdentity": null
       },
       "resources": [],
-      "shortDescription": "",
+      "shortDescription": "ChatGPT-Tauri",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
