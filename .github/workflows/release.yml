@@ -70,11 +70,6 @@ jobs:
       - name: Install rust target
         run: rustup target add ${{ matrix.target }}
 
-      - name: fix tray icon
-        if: matrix.os != 'macos-latest'
-        run: |
-          pnpm fix:tray
-
       - run: pnpm build --target ${{ matrix.target }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -159,48 +154,3 @@ jobs:
           prerelease: false
           generate_release_notes: false
           files: ./artifacts/**/*
-
-  updater:
-    runs-on: ubuntu-latest
-    needs: release-chatgpt
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 7
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-
-      - name: Updater JSON
-        run: pnpm updater --token=${{ secrets.GITHUB_TOKEN }}
-
-      - name: Deploy install.json
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./updater
-          # force_orphan: true
-
-      - name: Query version number
-        run: echo "version=${GITHUB_REF:11}" >> $GITHUB_ENV
-
-  # publish-winget:
-  #   # Action can only be run on windows
-  #   runs-on: windows-latest
-  #   needs: [build-chatgpt, release-chatgpt]
-  #   steps:
-  #     - uses: vedantmgoyal2009/winget-releaser@v1
-  #       with:
-  #         identifier: lencx.ChatGPT
-  #         token: ${{ secrets.WINGET_TOKEN }}
-  #         version: ${{ github.event.release.tag_name }}
