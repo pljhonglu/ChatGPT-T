@@ -34,6 +34,7 @@ async function listenToEventIfNeeded(): Promise<void> {
 }
 
 export async function fetchChatAPIProcess(
+  apiKey: string,
   messages: Chat.RequestMessage[],
   progressHandler?: (detail: string, role: string) => void,
   signal?: GenericAbortSignal,
@@ -57,6 +58,7 @@ export async function fetchChatAPIProcess(
 
   await invoke('fetch_chat_api', {
     id,
+    token: apiKey,
     messages,
     temperature: 0.6,
   })

@@ -18,6 +18,8 @@ pub enum Error {
     Json(#[from] serde_json::Error),
     #[error(transparent)]
     Stream(#[from] EventStreamError<reqwest::Error>),
+    #[error("Custom Error")]
+    Custom(String)
 }
 
 impl Serialize for Error {
@@ -51,6 +53,7 @@ impl ProgressPayload {
 pub async fn fetch_chat_api(
     handle: AppHandle,
     id: u64,
+    token: String,
     messages: Vec<HashMap<String, String>>,
     temperature: f32
 ) -> Result<u64> {
@@ -67,10 +70,19 @@ pub async fn fetch_chat_api(
     let client = reqwest::Client::new();
     let res = client.post(url)
         .header("Content-Type", "application/json")
-        .header("Authorization", "Bearer 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")
+        .header("Authorization", format!("Bearer {}", token))
         .body(data.to_string())
         .send()
         .await?;
+    
+    if res.status().as_u16() != 200 {
+        let content = format!("Request Error: {}", res.status().as_str());
+        let role = String::from("");
+        let finish_reason = String::from("error");
+        let progress = ProgressPayload {id, detail:content, role, finish_reason};
+        progress.emit_finished(&handle);
+        Error::Custom(format!("Request Error: {}", res.status().as_str()));
+    }
 
     let mut stream = res.bytes_stream().eventsource();
     while let Some(chunk) = stream.try_next().await? {

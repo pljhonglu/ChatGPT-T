@@ -17,7 +17,7 @@ export function defaultSetting(): UserState {
     userInfo: {
       avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
       name: null,
-      apiKey: '',
+      apiKey: import.meta.env.VITE_GLOB_OPENAI_KEY,
     },
   }
 }

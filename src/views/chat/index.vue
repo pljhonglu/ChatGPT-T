@@ -13,20 +13,19 @@ import { useUsingContext } from './hooks/useUsingContext'
 import HeaderComponent from './components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { useChatStore, usePromptStore } from '@/store'
+import { useChatStore, usePromptStore, useUserStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
-// import { ChatLayout } from './layout'
 
 let controller = new AbortController()
-
-// const openLongReply = import.meta.env.VITE_GLOB_OPEN_LONG_REPLY === 'true'
 
 const route = useRoute()
 const dialog = useDialog()
 const ms = useMessage()
 
 const chatStore = useChatStore()
+const userStore = useUserStore()
+const userInfo = computed(() => userStore.userInfo)
 
 useCopyCode()
 
@@ -61,6 +60,12 @@ async function onConversation() {
   if (!message || message.trim() === '')
     return
 
+  const api_key = userInfo.value.apiKey
+  if (!api_key || api_key.trim() === '') {
+    ms.error('请先设置 api key')
+    return
+  }
+
   controller = new AbortController()
 
   addChat(
@@ -94,7 +99,7 @@ async function onConversation() {
   try {
     let lastText = ''
     const fetchChatAPIOnce = async () => {
-      await fetchChatAPIProcess(messages, (detail: string, _: string) => {
+      await fetchChatAPIProcess(api_key, messages, (detail: string, _: string) => {
         try {
           lastText = lastText + detail ?? ''
           updateChat(
@@ -171,6 +176,11 @@ async function onConversation() {
 async function onRegenerate(index: number) {
   if (loading.value)
     return
+  const api_key = userInfo.value.apiKey
+  if (!api_key || api_key.trim() === '') {
+    ms.error('请先设置 api key')
+    return
+  }
 
   controller = new AbortController()
   const { requestOptions } = dataSources.value[index]
@@ -198,6 +208,7 @@ async function onRegenerate(index: number) {
     let lastText = ''
     const fetchChatAPIOnce = async () => {
       await fetchChatAPIProcess(
+        api_key,
         messages!,
         (detail: string, _: string) => {
           try {
