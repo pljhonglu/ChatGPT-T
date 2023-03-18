@@ -55,7 +55,7 @@ function saveUserInfo() {
       userInfo.value.apiKey = model.value.apiKey
       userStore.recordState()
       ms.success(t('common.success'))
-      window.location.reload()
+      // window.location.reload()
     }
   })
 }
