@@ -55,6 +55,7 @@ export default {
   setting: {
     setting: '設定',
     general: '總覽',
+    aboud: '關於',
     config: '設定',
     avatarLink: '頭貼連結',
     name: '名稱',
@@ -67,6 +68,7 @@ export default {
     timeout: '逾時',
     socks: 'Socks',
     httpsProxy: 'HTTPS Proxy',
+    saveUserInfoBtn: '保存',
   },
   store: {
     local: '本機',

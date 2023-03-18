@@ -33,7 +33,7 @@ async function listenToEventIfNeeded(): Promise<void> {
   })
 }
 
-export async function fetchChatAPIProcess<T = any>(
+export async function fetchChatAPIProcess(
   messages: Chat.RequestMessage[],
   progressHandler?: (detail: string, role: string) => void,
   signal?: GenericAbortSignal,
@@ -59,12 +59,6 @@ export async function fetchChatAPIProcess<T = any>(
     id,
     messages,
     temperature: 0.6,
-  })
-}
-
-export function fetchChatConfig<T = any>() {
-  return post<T>({
-    url: '/config',
   })
 }
 

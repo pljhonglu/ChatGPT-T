@@ -1,14 +1,16 @@
 {
-  "name": "chatgpt-web",
+  "name": "ChatGPT-T",
   "version": "2.10.5",
   "private": false,
-  "description": "ChatGPT Web",
-  "author": "ChenZhaoYu <chenzhaoyu1994@gmail.com>",
+  "description": "ChatGPT Tauri",
+  "author": "pljhonglu@gmail.com",
+  "homepage": "https://github.com/pljhonglu/ChatGPT-T",
   "keywords": [
-    "chatgpt-web",
+    "chatgpt-tauri",
     "chatgpt",
     "chatbot",
-    "vue"
+    "vue",
+    "tauri"
   ],
   "scripts": {
     "dev:fe": "vite",

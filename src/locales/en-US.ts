@@ -55,6 +55,7 @@ export default {
   setting: {
     setting: 'Setting',
     general: 'General',
+    aboud: 'Aboud',
     config: 'Config',
     avatarLink: 'Avatar Link',
     name: 'Name',
@@ -67,6 +68,7 @@ export default {
     timeout: 'Timeout',
     socks: 'Socks',
     httpsProxy: 'HTTPS Proxy',
+    saveUserInfoBtn: 'Save',
   },
   store: {
     local: 'Local',
