@@ -40,8 +40,6 @@ jobs:
         with:
           projectPath: src-tauri
           configPath: src-tauri/tauri.conf.json
-          distPath: dist
-          iconPath: src-tauri/icons
           tauriScript: pnpm
           tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
           releaseName: 'App v__VERSION__'
