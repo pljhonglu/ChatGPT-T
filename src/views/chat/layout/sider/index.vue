@@ -16,8 +16,10 @@ const show = ref(false)
 
 const collapsed = computed(() => appStore.siderCollapsed)
 
-function handleAdd() {
-  chatStore.addHistory({ title: 'New Chat', uuid: Date.now(), isEdit: false })
+function handleAdd(event: Event) {
+  const input = event.target as HTMLElement
+  const title = input.innerText
+  chatStore.addHistory({ title, uuid: Date.now(), isEdit: false })
 }
 
 function handleUpdateCollapsed() {
@@ -70,8 +72,8 @@ watch(
     <div class="flex flex-col h-full" :style="mobileSafeArea">
       <main class="flex flex-col flex-1 min-h-0">
         <div class="p-4">
-          <NButton dashed block @click="handleAdd">
-            New chat
+          <NButton dashed block @click="handleAdd($event)">
+            {{ $t('sider.newChat') }}
           </NButton>
         </div>
         <div class="flex-1 min-h-0 pb-4 overflow-hidden">
@@ -79,7 +81,7 @@ watch(
         </div>
         <div class="p-4">
           <NButton block @click="show = true">
-            Prompt Store
+            {{ $t('sider.promptStore') }}
           </NButton>
         </div>
       </main>

@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { NAutoComplete, NButton, NInput, useDialog, useMessage } from 'naive-ui'
 import html2canvas from 'html2canvas'
+import { invoke } from '@tauri-apps/api'
 import { Message } from './components'
 import { useScroll } from './hooks/useScroll'
 import { useChat } from './hooks/useChat'
@@ -269,19 +270,14 @@ function handleExport() {
         const canvas = await html2canvas(ele as HTMLDivElement, {
           useCORS: true,
         })
-        const imgUrl = canvas.toDataURL('image/png')
-        const tempLink = document.createElement('a')
-        tempLink.style.display = 'none'
-        tempLink.href = imgUrl
-        tempLink.setAttribute('download', 'chat-shot.png')
-        if (typeof tempLink.download === 'undefined')
-          tempLink.setAttribute('target', '_blank')
+        const imgData = canvas.toDataURL('image/png')
+        const binaryData = atob(imgData.split('base64,')[1])
+        const data = []
+        for (let i = 0; i < binaryData.length; i++)
+          data.push(binaryData.charCodeAt(i))
 
-        document.body.appendChild(tempLink)
-        tempLink.click()
-        document.body.removeChild(tempLink)
-        window.URL.revokeObjectURL(imgUrl)
-        d.loading = false
+        await invoke('download', { name: 'ChatGPT-xxxx.jpg', blob: data })
+
         ms.success(t('chat.exportSuccess'))
         Promise.resolve()
       }

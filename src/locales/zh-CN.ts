@@ -47,13 +47,17 @@ export default {
     deleteHistoryConfirm: '确定删除此记录?',
     clearHistoryConfirm: '确定清空聊天记录?',
   },
+  sider: {
+    login: '登录',
+    promptStore: 'Prompt Store',
+    newChat: '新建聊天',
+  },
   setting: {
     setting: '设置',
     general: '总览',
     config: '配置',
     avatarLink: '头像链接',
     name: '名称',
-    description: '描述',
     resetUserInfo: '重置用户信息',
     chatHistory: '聊天记录',
     theme: '主题',

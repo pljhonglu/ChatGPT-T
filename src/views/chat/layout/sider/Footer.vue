@@ -17,7 +17,6 @@ const show = ref(false)
         <SvgIcon icon="ri:settings-4-line" />
       </span>
     </HoverButton>
-
     <Setting v-if="show" v-model:visible="show" />
   </footer>
 </template>

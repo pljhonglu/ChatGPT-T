@@ -47,13 +47,17 @@ export default {
     deleteHistoryConfirm: '確定刪除此紀錄?',
     clearHistoryConfirm: '確定清除紀錄?',
   },
+  sider: {
+    login: '登錄',
+    promptStore: 'Prompt Store',
+    newChat: '新建聊天',
+  },
   setting: {
     setting: '設定',
     general: '總覽',
     config: '設定',
     avatarLink: '頭貼連結',
     name: '名稱',
-    description: '描述',
     resetUserInfo: '重設使用者資訊',
     chatHistory: '紀錄',
     theme: '主題',

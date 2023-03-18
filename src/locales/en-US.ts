@@ -47,13 +47,17 @@ export default {
     deleteHistoryConfirm: 'Are you sure to clear this history?',
     clearHistoryConfirm: 'Are you sure to clear chat history?',
   },
+  sider: {
+    login: 'Login',
+    promptStore: 'Prompt Store',
+    newChat: 'New Chat',
+  },
   setting: {
     setting: 'Setting',
     general: 'General',
     config: 'Config',
     avatarLink: 'Avatar Link',
     name: 'Name',
-    description: 'Description',
     resetUserInfo: 'Reset UserInfo',
     chatHistory: 'ChatHistory',
     theme: 'Theme',
