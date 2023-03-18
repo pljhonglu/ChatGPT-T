@@ -20,10 +20,10 @@ const rules: FormRules = {
   name: [
     {
       required: true,
-      message: '请输入昵称',
+      message: t('setting.namePlaceholder'),
       validator(rule: FormItemRule, value: string) {
         if (!value)
-          return new Error('不能为空')
+          return new Error(t('setting.nameNotEmptyError'))
 
         return true
       },
@@ -65,13 +65,13 @@ function saveUserInfo() {
   <div class="p-4 space-y-5 min-h-[200px]">
     <NForm ref="formRef" :model="model" :rules="rules">
       <NFormItem path="avatar" :label="$t('setting.avatarLink')">
-        <NInput v-model:value="model.avatar" placeholder="" />
+        <NInput v-model:value="model.avatar" :placeholder="$t('setting.avatarLinkPlaceholder')" />
       </NFormItem>
       <NFormItem path="name" :label="$t('setting.name')">
-        <NInput v-model:value="model.name" placeholder="" />
+        <NInput v-model:value="model.name" :placeholder="$t('setting.namePlaceholder')" />
       </NFormItem>
       <NFormItem path="apiKey" label="Openai API Key">
-        <NInput v-model:value="model.apiKey" placeholder="" />
+        <NInput v-model:value="model.apiKey" placeholder="Openai API Key" />
       </NFormItem>
       <div class="flex items-center justify-end">
         <NButton size="small" @click="saveUserInfo">
