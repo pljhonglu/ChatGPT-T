@@ -1,45 +1,145 @@
-name: 'publish'
+name: Release CI
+
 on:
   push:
-    branches:
-      - release
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
+  build-chatgpt:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-20.04, windows-latest]
+        include:
+          - build: linux
+            os: ubuntu-latest
+            arch: x86_64
+            target: x86_64-unknown-linux-gnu
+          - build: macos
+            os: macos-latest
+            arch: x86_64
+            target: x86_64-apple-darwin
+          - buid: macos
+            os: macos-latest
+            arch: aarch64
+            target: aarch64-apple-darwin
+          - build: windows
+            os: windows-latest
+            arch: x86_64
+            target: x86_64-pc-windows-msvc
 
-    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v3
-      - name: setup node
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
-      - name: install Rust stable
+          node-version: 18
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Install xattr (macos only)
+        if: matrix.os == 'macos-latest'
+        run: pip install xattr
+
+      - name: Install dependencies (ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
-      - name: install frontend dependencies
-        run: pnpm install # change this to npm or pnpm depending on which one you use
-      - uses: tauri-apps/tauri-action@v0
+          sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libayatana-appindicator3-dev librsvg2-dev patchelf
+
+      - name: Build FE
+        run: pnpm build:fe
+
+      - name: Install rust target
+        run: rustup target add ${{ matrix.target }}
+
+      - run: pnpm build --target ${{ matrix.target }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - uses: actions/upload-artifact@v3
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: artifacts-${{ matrix.arch }}
+          path: |
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/appimage/**.AppImage.*
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/deb/**.deb
+
+      - uses: actions/upload-artifact@v3
+        if: matrix.os == 'macos-latest'
+        with:
+          name: artifacts-${{ matrix.arch }}
+          path: |
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/dmg/**.dmg
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/macos/**.app.*
+
+      - uses: actions/upload-artifact@v3
+        if: matrix.os == 'windows-latest'
+        with:
+          name: artifacts-${{ matrix.arch }}
+          path: |
+            ./src-tauri/target/${{ matrix.target }}/release/bundle/msi/**
+
+  release-chatgpt:
+    needs: build-chatgpt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install xattr
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xattr
+
+      - name: Query version number
+        run: echo "version=${GITHUB_REF:11}" >> $GITHUB_ENV
+
+      - name: Download x86_64 artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: artifacts-x86_64
+          path: artifacts/x86_64
+
+      - name: Download aarch64 artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: artifacts-aarch64
+          path: artifacts/aarch64
+
+      - name: Rename artifacts
+        run: |
+          mv "artifacts/aarch64/dmg/ChatGPT-Tauri_${{ env.version }}_aarch64.dmg" "artifacts/ChatGPT-Tauri_${{ env.version }}_macos_aarch64.dmg"
+          mv "artifacts/x86_64/dmg/ChatGPT-Tauri_${{ env.version }}_x64.dmg" "artifacts/ChatGPT-Tauri_${{ env.version }}_macos_x86_64.dmg"
+          mv "artifacts/x86_64/deb/chat-gpt-tauri_${{ env.version }}_amd64.deb" "artifacts/x86_64/deb/ChatGPT-Tauri_${{ env.version }}_linux_x86_64.deb"
+          mv "artifacts/x86_64/ChatGPT-Tauri_${{ env.version }}_x64_en-US.msi" "artifacts/ChatGPT-Tauri_${{ env.version }}_windows_x86_64.msi"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          projectPath: src-tauri
-          configPath: src-tauri/tauri.conf.json
-          distPath: dist
-          iconPath: src-tauri/icons
-          tauriScript: pnpm
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
+          tag_name: v${{ env.version }}
+          name: ChatGPT v${{ env.version }}
+          body: See the assets to download this version and install.
           prerelease: false
+          generate_release_notes: false
+          files: ./artifacts/**/*
