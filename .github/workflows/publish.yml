@@ -43,11 +43,15 @@ jobs:
           run_install: false
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
       - name: install dependencies (ubuntu only)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+      - name: Install rust target
+        run: rustup target add ${{ matrix.target }}
       - name: install frontend dependencies
         run: pnpm install --frozen-lockfile
       - uses: tauri-apps/tauri-action@v0
@@ -62,4 +66,3 @@ jobs:
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
-          args: --target ${{ matrix.target }}
