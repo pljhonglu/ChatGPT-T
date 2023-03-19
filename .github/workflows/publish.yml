@@ -1,4 +1,4 @@
-name: 'publish'
+name: publish
 on:
   push:
     branches:
@@ -62,8 +62,8 @@ jobs:
           configPath: src-tauri/tauri.conf.json
           tauriScript: pnpm
           tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseName: v__VERSION__
+          releaseBody: See the assets to download this version and install.
           releaseDraft: true
           prerelease: false
           args: --target ${{ matrix.target }}
