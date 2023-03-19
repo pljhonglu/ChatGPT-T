@@ -4,7 +4,8 @@ use eventsource_stream::{Eventsource, EventStreamError};
 use serde_json::{json, Value};
 use serde::{ser::Serializer, Serialize, Deserialize};
 use futures::{TryStreamExt};
-use std::{collections::HashMap};
+use std::{collections::HashMap, time::Duration};
+use log::{error, info};
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -66,14 +67,15 @@ pub async fn fetch_chat_api(
         "temperature": temperature,
         "stream": true
     });
-    
     let client = reqwest::Client::new();
     let res = client.post(url)
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Bearer {}", token))
+        .timeout(Duration::from_secs(300))
         .body(data.to_string())
         .send()
         .await?;
+    info!("send message: {}", json!(messages));
     
     if res.status().as_u16() != 200 {
         let content = format!("Request Error: {}", res.status().as_str());

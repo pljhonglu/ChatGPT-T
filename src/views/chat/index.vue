@@ -51,6 +51,22 @@ function handleSubmit() {
   onConversation()
 }
 
+function generateMessages(index: number) {
+  const messages: Chat.RequestMessage[] = []
+  const ds = dataSources.value
+  if (usingContext.value) {
+    const allData = ds.slice(0, index + 1)
+    allData.forEach((item) => {
+      messages.push({ role: item.inversion ? 'user' : 'assistant', content: item.text })
+    })
+  }
+  else {
+    const data = ds[index]
+    messages.push({ role: 'user', content: data.text })
+  }
+  return messages
+}
+
 async function onConversation() {
   const message = prompt.value
 
@@ -75,14 +91,13 @@ async function onConversation() {
       text: message,
       inversion: true,
       error: false,
-      requestOptions: { },
     },
   )
   scrollToBottom()
 
   loading.value = true
   prompt.value = ''
-  const messages: Chat.RequestMessage[] = [{ role: 'user', content: message }]
+  const messages: Chat.RequestMessage[] = generateMessages(dataSources.value.length - 1)
   addChat(
     +uuid,
     {
@@ -91,7 +106,6 @@ async function onConversation() {
       loading: true,
       inversion: false,
       error: false,
-      requestOptions: { messages },
     },
   )
   scrollToBottom()
@@ -111,7 +125,6 @@ async function onConversation() {
               inversion: false,
               error: false,
               loading: false,
-              requestOptions: { messages },
             },
           )
           scrollToBottom()
@@ -163,7 +176,6 @@ async function onConversation() {
         inversion: false,
         error: true,
         loading: false,
-        requestOptions: { messages },
       },
     )
     scrollToBottom()
@@ -183,9 +195,7 @@ async function onRegenerate(index: number) {
   }
 
   controller = new AbortController()
-  const { requestOptions } = dataSources.value[index]
-
-  const messages = requestOptions?.messages
+  const messages = generateMessages(index)
   if (!messages || messages.length === 0)
     return
 
@@ -200,7 +210,6 @@ async function onRegenerate(index: number) {
       inversion: false,
       error: false,
       loading: true,
-      requestOptions: { messages },
     },
   )
 
@@ -222,7 +231,6 @@ async function onRegenerate(index: number) {
                 inversion: false,
                 error: false,
                 loading: false,
-                requestOptions: { messages },
               },
             )
           }
@@ -256,7 +264,6 @@ async function onRegenerate(index: number) {
         inversion: false,
         error: true,
         loading: false,
-        requestOptions: { messages },
       },
     )
   }
@@ -287,7 +294,7 @@ function handleExport() {
         for (let i = 0; i < binaryData.length; i++)
           data.push(binaryData.charCodeAt(i))
 
-        await invoke('download', { name: 'ChatGPT-xxxx.jpg', blob: data })
+        await invoke('download_img', { name: 'ChatGPT-xxxx.jpg', blob: data })
 
         ms.success(t('chat.exportSuccess'))
         Promise.resolve()

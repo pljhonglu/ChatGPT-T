@@ -6,7 +6,6 @@ declare namespace Chat {
 		inversion?: boolean
 		error?: boolean
 		loading?: boolean
-		requestOptions: { messages?: RequestMessage[]; }
 	}
 
 	interface History {
