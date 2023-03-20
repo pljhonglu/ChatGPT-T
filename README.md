@@ -5,8 +5,8 @@ __该客户端仅支持 open-api 的方式使用__
 
 ## 预览
 
-<img width="320" src="docs/s1.png" alt="install">
-<img width="320" src="docs/s2.png" alt="install">
+![demo](docs/s1.png)
+![demo](docs/s2.png)
 
 ## 介绍
 
