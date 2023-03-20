@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { UserInfo, UserState } from './helper'
-import { defaultSetting, getLocalState, setLocalState } from './helper'
+import { allModels, defaultSetting, getLocalState, setLocalState } from './helper'
 
 export const useUserStore = defineStore('user-store', {
   state: (): UserState => getLocalState(),
@@ -17,6 +17,10 @@ export const useUserStore = defineStore('user-store', {
 
     recordState() {
       setLocalState(this.$state)
+    },
+
+    allModels(): string[] {
+      return allModels()
     },
   },
 })

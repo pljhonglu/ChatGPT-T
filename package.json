@@ -29,10 +29,12 @@
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
     "@traptitech/markdown-it-katex": "^3.6.0",
+    "@types/lodash": "^4.14.191",
     "@vueuse/core": "^9.13.0",
     "highlight.js": "^11.7.0",
     "html2canvas": "^1.4.1",
     "katex": "^0.16.4",
+    "lodash": "^4.17.21",
     "markdown-it": "^13.0.1",
     "naive-ui": "^2.34.3",
     "pinia": "^2.0.32",

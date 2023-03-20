@@ -42,22 +42,23 @@ fn main() {
     cmd::gpt::fetch_chat_api,
     cmd::download::download_img
   ])
-  .setup(builder::setup)
-  .build(tauri::generate_context!())
-  .expect("error while running tauri application")
-  .run(|app, event| match event {
-    tauri::RunEvent::WindowEvent {
-      label,
-      event: win_event,
-      ..
-    } => match win_event {
-      tauri::WindowEvent::CloseRequested { api, .. } => {
-        let win = app.get_window(label.as_str()).unwrap();
-        win.minimize().unwrap();
+  .setup(builder::setup);
+
+  #[cfg(target_os = "macos")]
+  {
+    builder = builder.on_window_event(move |event| {
+      if let tauri::WindowEvent::CloseRequested { api, .. } = event.event() {
+        let win = event.window().clone();
+        if win.label() == "core" {
+          win.minimize().unwrap();
+        }else {
+          event.window().close().unwrap();
+        }
         api.prevent_close();
       }
-      _ => {}
-    },
-    _ => {}
-  });
+    })
+  }
+  
+  builder.run(tauri::generate_context!())
+  .expect("error while running tauri application");
 }

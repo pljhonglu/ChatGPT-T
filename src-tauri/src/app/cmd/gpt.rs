@@ -54,13 +54,15 @@ impl ProgressPayload {
 pub async fn fetch_chat_api(
     handle: AppHandle,
     id: u64,
+    proxy: Option<String>,
     token: String,
+    model: String,
     messages: Vec<HashMap<String, String>>,
     temperature: f32
 ) -> Result<u64> {
     // https://platform.openai.com/docs/guides/chat/introduction
+    // "https://api.openai.com/v1/chat/completions";
     let url = "https://api.openai.com/v1/chat/completions";
-    let model = "gpt-3.5-turbo";
     let data = json!({
         "model": model,
         "messages": messages,

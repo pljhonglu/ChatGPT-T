@@ -113,7 +113,7 @@ async function onConversation() {
   try {
     let lastText = ''
     const fetchChatAPIOnce = async () => {
-      await fetchChatAPIProcess(api_key, messages, (detail: string, _: string) => {
+      await fetchChatAPIProcess(api_key, userInfo.value.proxy, userInfo.value.modelName, messages, (detail: string, _: string) => {
         try {
           lastText = lastText + detail ?? ''
           updateChat(
@@ -218,6 +218,8 @@ async function onRegenerate(index: number) {
     const fetchChatAPIOnce = async () => {
       await fetchChatAPIProcess(
         api_key,
+        userInfo.value.proxy,
+        userInfo.value.modelName,
         messages!,
         (detail: string, _: string) => {
           try {

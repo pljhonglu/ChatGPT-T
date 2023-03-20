@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
 import type { FormInst, FormItemRule, FormRules } from 'naive-ui'
-import { NButton, NForm, NFormItem, NInput, useMessage } from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput, NSelect, useMessage } from 'naive-ui'
 import { useUserStore } from '@/store'
 import { t } from '@/locales'
 
@@ -14,7 +14,14 @@ const model = ref({
   name: userInfo.value.name,
   avatar: userInfo.value.avatar,
   apiKey: userInfo.value.apiKey,
+  modelName: userInfo.value.modelName,
+  proxy: userInfo.value.proxy,
 })
+
+const models = userStore.allModels().map(v => ({
+  label: v,
+  value: v,
+}))
 
 const rules: FormRules = {
   name: [
@@ -30,6 +37,18 @@ const rules: FormRules = {
       trigger: ['input', 'blur'],
     },
   ],
+  proxy: [{
+    required: false,
+    validator(rule: FormItemRule, value: string) {
+      if (!value || value.length === 0)
+        return true
+
+      else if (!/^(socks5|http|https):\/\/.+$/.test(value))
+        return new Error('请输入正确的proxy')
+      return true
+    },
+    trigger: ['input', 'blur'],
+  }],
   apiKey: [
     {
       required: true,
@@ -53,6 +72,9 @@ function saveUserInfo() {
       userInfo.value.name = model.value.name
       userInfo.value.avatar = model.value.avatar
       userInfo.value.apiKey = model.value.apiKey
+      userInfo.value.modelName = model.value.modelName
+      userInfo.value.proxy = model.value.proxy
+
       userStore.recordState()
       ms.success(t('common.success'))
       // window.location.reload()
@@ -73,6 +95,12 @@ function saveUserInfo() {
       <NFormItem path="apiKey" label="Openai API Key">
         <NInput v-model:value="model.apiKey" placeholder="Openai API Key" />
       </NFormItem>
+      <NFormItem path="modelName" label="Model Name">
+        <NSelect v-model:value="model.modelName" placeholder="Select" :options="models" />
+      </NFormItem>
+      <!-- <NFormItem path="proxy" label="Proxy">
+        <NInput v-model:value="model.proxy" placeholder="http://127.0.0.1:7890" />
+      </NFormItem> -->
       <div class="flex items-center justify-end">
         <NButton size="small" @click="saveUserInfo">
           {{ $t('setting.saveUserInfoBtn') }}
