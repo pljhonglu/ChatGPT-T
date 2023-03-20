@@ -69,7 +69,15 @@ pub async fn fetch_chat_api(
         "temperature": temperature,
         "stream": true
     });
-    let client = reqwest::Client::new();
+    let mut client_builder = reqwest::Client::builder();
+
+    let p = proxy.unwrap_or(String::from(""));
+    log::info!("proxy is: {}", p);
+    if p.len()>0 {
+        let proxy = reqwest::Proxy::all(p).unwrap();
+        client_builder = client_builder.proxy(proxy);
+    }
+    let client = client_builder.build().unwrap();
     let res = client.post(url)
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Bearer {}", token))

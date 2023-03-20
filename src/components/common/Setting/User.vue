@@ -43,8 +43,8 @@ const rules: FormRules = {
       if (!value || value.length === 0)
         return true
 
-      else if (!/^(socks5|http|https):\/\/.+$/.test(value))
-        return new Error('请输入正确的proxy')
+      else if (!/^(socks5):\/\/.+$/.test(value))
+        return new Error('Proxy must start with socks5://')
       return true
     },
     trigger: ['input', 'blur'],
@@ -98,9 +98,9 @@ function saveUserInfo() {
       <NFormItem path="modelName" label="Model Name">
         <NSelect v-model:value="model.modelName" placeholder="Select" :options="models" />
       </NFormItem>
-      <!-- <NFormItem path="proxy" label="Proxy">
-        <NInput v-model:value="model.proxy" placeholder="http://127.0.0.1:7890" />
-      </NFormItem> -->
+      <NFormItem path="proxy" label="Proxy">
+        <NInput v-model:value="model.proxy" placeholder="socks5://127.0.0.1:7890" />
+      </NFormItem>
       <div class="flex items-center justify-end">
         <NButton size="small" @click="saveUserInfo">
           {{ $t('setting.saveUserInfoBtn') }}
