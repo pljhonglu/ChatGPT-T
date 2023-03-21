@@ -1,6 +1,6 @@
 {
   "name": "ChatGPT-T",
-  "version": "2.10.5",
+  "version": "0.0.0",
   "private": false,
   "description": "ChatGPT Tauri",
   "author": "pljhonglu@gmail.com",
@@ -24,7 +24,9 @@
     "bootstrap": "pnpm install && pnpm run common:prepare",
     "common:cleanup": "rimraf node_modules && rimraf pnpm-lock.yaml",
     "common:prepare": "husky install",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "updater": "tr updater",
+    "release": "tr release --git"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
@@ -48,6 +50,7 @@
     "@commitlint/config-conventional": "^17.4.4",
     "@iconify/vue": "^4.1.0",
     "@tauri-apps/cli": "^1.2.3",
+    "@tauri-release/cli": "^0.2.5",
     "@types/crypto-js": "^4.1.1",
     "@types/katex": "^0.16.0",
     "@types/markdown-it": "^12.2.3",
