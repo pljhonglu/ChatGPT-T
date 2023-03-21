@@ -19,8 +19,8 @@ pub enum Error {
     Json(#[from] serde_json::Error),
     #[error(transparent)]
     Stream(#[from] EventStreamError<reqwest::Error>),
-    #[error("Custom Error")]
-    Custom(String)
+    #[error("Custom Error: (code: {code:?}, message: {msg:?})")]
+    Custom{code: u16, msg: String}
 }
 
 impl Serialize for Error {
@@ -44,10 +44,6 @@ impl ProgressPayload {
     pub fn emit_progress(&self, handle: &AppHandle) {
         handle.emit_all("CHAT_FETCHEING_PROGRESS", &self).ok();
     }
-
-    pub fn emit_finished(&self, handle: &AppHandle) {
-        handle.emit_all("CHAT_FETCHEING_FINISHED", &self).ok();
-    }
 }
 
 #[tauri::command]
@@ -69,15 +65,17 @@ pub async fn fetch_chat_api(
         "temperature": temperature,
         "stream": true
     });
-    let mut client_builder = reqwest::Client::builder();
+    let proxy_str = proxy.unwrap_or(String::from(""));
 
-    let p = proxy.unwrap_or(String::from(""));
-    log::info!("proxy is: {}", p);
-    if p.len()>0 {
-        let proxy = reqwest::Proxy::all(p).unwrap();
-        client_builder = client_builder.proxy(proxy);
-    }
-    let client = client_builder.build().unwrap();
+    let client : reqwest::Client = {
+        log::info!("proxy is: {}", proxy_str);
+        let mut client_builder = reqwest::Client::builder();
+        if proxy_str.len()>0 {
+            let proxy = reqwest::Proxy::all(proxy_str).unwrap();
+            client_builder = client_builder.proxy(proxy);
+        }
+        client_builder.build().unwrap()
+    };
     let res = client.post(url)
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Bearer {}", token))
@@ -88,24 +86,14 @@ pub async fn fetch_chat_api(
     info!("send message: {}", json!(messages));
     
     if res.status().as_u16() != 200 {
-        let content = format!("Request Error: {}", res.status().as_str());
-        let role = String::from("");
-        let finish_reason = String::from("error");
-        let progress = ProgressPayload {id, detail:content, role, finish_reason};
-        progress.emit_finished(&handle);
-        Error::Custom(format!("Request Error: {}", res.status().as_str()));
+        return Err(Error::Custom {code: res.status().as_u16(), msg:String::from("openai api request error!")})
     }
 
     let mut stream = res.bytes_stream().eventsource();
     while let Some(chunk) = stream.try_next().await? {
         let chunk = chunk.data;
         if chunk == "[DONE]" {
-            let content = String::from("");
-            let role = String::from("");
-            let finish_reason = String::from("");
-            let progress = ProgressPayload {id, detail:content, role, finish_reason};
-            progress.emit_finished(&handle);
-            break;
+            return Ok(id)
         } else {
             let object:Value = serde_json::from_str(&chunk)?;
             let delta = &object["choices"][0]["delta"];

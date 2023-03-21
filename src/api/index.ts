@@ -24,13 +24,6 @@ async function listenToEventIfNeeded(): Promise<void> {
     if (handler != null)
       handler(payload)
   })
-  await event.listen<ProgressPayload>('CHAT_FETCHEING_FINISHED', ({ payload }) => {
-    const handler = handlers.get(payload.id)
-    if (handler != null) {
-      handler(payload)
-      handlers.delete(payload.id)
-    }
-  })
 }
 
 export async function fetchChatAPIProcess(
@@ -39,6 +32,7 @@ export async function fetchChatAPIProcess(
   modelName: string,
   messages: Chat.RequestMessage[],
   progressHandler?: (detail: string, role: string) => void,
+  errorHandle?: (err: Error) => void,
   signal?: GenericAbortSignal,
 ) {
   const ids = new Uint32Array(1)
@@ -55,6 +49,8 @@ export async function fetchChatAPIProcess(
   if (signal) {
     signal.onabort = () => {
       handlers.delete(id)
+      if (errorHandle)
+        errorHandle(new Error('canceled'))
     }
   }
   await invoke('fetch_chat_api', {
@@ -64,7 +60,12 @@ export async function fetchChatAPIProcess(
     model: modelName,
     messages,
     temperature: 0.6,
+  }).catch((error) => {
+    handlers.delete(id)
+    if (errorHandle)
+      errorHandle(new Error(error))
   })
+  handlers.delete(id)
 }
 
 export function fetchSession<T>() {

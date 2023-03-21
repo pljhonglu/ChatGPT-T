@@ -30,7 +30,7 @@ const userInfo = computed(() => userStore.userInfo)
 useCopyCode()
 
 const { isMobile } = useBasicLayout()
-const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
+const { addChat, updateChat, updateChatSome } = useChat()
 const { scrollRef, scrollToBottom } = useScroll()
 const { usingContext, toggleUsingContext } = useUsingContext()
 
@@ -67,6 +67,57 @@ function generateMessages(index: number) {
   return messages
 }
 
+async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, index: number) {
+  const api_key = userInfo.value.apiKey
+  if (!api_key || api_key.trim() === '') {
+    ms.error('请先设置 api key')
+    return
+  }
+  controller = new AbortController()
+
+  let lastText = ''
+  await fetchChatAPIProcess(
+    api_key,
+    userInfo.value.proxy,
+    userInfo.value.modelName,
+    messages,
+    (detail: string, _: string) => {
+      lastText = lastText + detail ?? ''
+      updateChat(+uuid, index,
+        {
+          dateTime: new Date().toLocaleString(),
+          text: lastText,
+          inversion: false,
+          error: false,
+          loading: false,
+        },
+      )
+    },
+    (error: Error) => {
+      const errorMessage = error?.message ?? t('common.wrong')
+      if (errorMessage === 'canceled') {
+        updateChatSome(+uuid, index,
+          {
+            loading: false,
+          },
+        )
+      }
+      else {
+        ms.error(errorMessage)
+        updateChat(+uuid, index,
+          {
+            dateTime: new Date().toLocaleString(),
+            text: t('common.wrong'),
+            inversion: false,
+            error: true,
+            loading: false,
+          },
+        )
+      }
+    },
+    controller.signal)
+}
+
 async function onConversation() {
   const message = prompt.value
 
@@ -75,14 +126,6 @@ async function onConversation() {
 
   if (!message || message.trim() === '')
     return
-
-  const api_key = userInfo.value.apiKey
-  if (!api_key || api_key.trim() === '') {
-    ms.error('请先设置 api key')
-    return
-  }
-
-  controller = new AbortController()
 
   addChat(
     +uuid,
@@ -110,97 +153,20 @@ async function onConversation() {
   )
   scrollToBottom()
 
-  try {
-    let lastText = ''
-    const fetchChatAPIOnce = async () => {
-      await fetchChatAPIProcess(api_key, userInfo.value.proxy, userInfo.value.modelName, messages, (detail: string, _: string) => {
-        try {
-          lastText = lastText + detail ?? ''
-          updateChat(
-            +uuid,
-            dataSources.value.length - 1,
-            {
-              dateTime: new Date().toLocaleString(),
-              text: lastText,
-              inversion: false,
-              error: false,
-              loading: false,
-            },
-          )
-          scrollToBottom()
-        }
-        catch (error) {
-          //
-        }
-      }, controller.signal)
-    }
-
-    await fetchChatAPIOnce()
-  }
-  catch (error: any) {
-    const errorMessage = error?.message ?? t('common.wrong')
-
-    if (error.message === 'canceled') {
-      updateChatSome(
-        +uuid,
-        dataSources.value.length - 1,
-        {
-          loading: false,
-        },
-      )
-      scrollToBottom()
-      return
-    }
-
-    const currentChat = getChatByUuidAndIndex(+uuid, dataSources.value.length - 1)
-
-    if (currentChat?.text && currentChat.text !== '') {
-      updateChatSome(
-        +uuid,
-        dataSources.value.length - 1,
-        {
-          text: `${currentChat.text}\n[${errorMessage}]`,
-          error: false,
-          loading: false,
-        },
-      )
-      return
-    }
-
-    updateChat(
-      +uuid,
-      dataSources.value.length - 1,
-      {
-        dateTime: new Date().toLocaleString(),
-        text: errorMessage,
-        inversion: false,
-        error: true,
-        loading: false,
-      },
-    )
-    scrollToBottom()
-  }
-  finally {
-    loading.value = false
-  }
+  await fetchChatMessage(messages, +uuid, dataSources.value.length - 1)
+  scrollToBottom()
+  loading.value = false
 }
 
 async function onRegenerate(index: number) {
   if (loading.value)
     return
-  const api_key = userInfo.value.apiKey
-  if (!api_key || api_key.trim() === '') {
-    ms.error('请先设置 api key')
-    return
-  }
 
-  controller = new AbortController()
   const messages = generateMessages(index)
   if (!messages || messages.length === 0)
     return
 
   loading.value = true
-
   updateChat(
     +uuid,
     index,
@@ -213,65 +179,9 @@ async function onRegenerate(index: number) {
     },
   )
 
-  try {
-    let lastText = ''
-    const fetchChatAPIOnce = async () => {
-      await fetchChatAPIProcess(
-        api_key,
-        userInfo.value.proxy,
-        userInfo.value.modelName,
-        messages!,
-        (detail: string, _: string) => {
-          try {
-            lastText = lastText + detail ?? ''
-            updateChat(
-              +uuid,
-              index,
-              {
-                dateTime: new Date().toLocaleString(),
-                text: lastText,
-                inversion: false,
-                error: false,
-                loading: false,
-              },
-            )
-          }
-          catch (error) {
-            //
-          }
-        }, controller.signal)
-    }
-    await fetchChatAPIOnce()
-  }
-  catch (error: any) {
-    if (error.message === 'canceled') {
-      updateChatSome(
-        +uuid,
-        index,
-        {
-          loading: false,
-        },
-      )
-      return
-    }
+  await fetchChatMessage(messages, +uuid, index)
 
-    const errorMessage = error?.message ?? t('common.wrong')
-
-    updateChat(
-      +uuid,
-      index,
-      {
-        dateTime: new Date().toLocaleString(),
-        text: errorMessage,
-        inversion: false,
-        error: true,
-        loading: false,
-      },
-    )
-  }
-  finally {
-    loading.value = false
-  }
+  loading.value = false
 }
 
 function handleExport() {

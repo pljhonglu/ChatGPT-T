@@ -7,8 +7,6 @@ mod app;
 mod utils;
 
 use app::{builder, cmd};
-use log::{error, info};
-use tauri::Manager;
 use tauri_plugin_log::{
   fern::colors::{Color, ColoredLevelConfig},
   LogTarget,

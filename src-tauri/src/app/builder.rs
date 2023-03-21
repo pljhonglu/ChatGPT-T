@@ -1,5 +1,5 @@
-use tauri::{App, Manager, WindowBuilder, WindowUrl};
-use log::{error, info};
+use tauri::{App, WindowBuilder, WindowUrl};
+use log;
 
 
 
@@ -14,7 +14,7 @@ pub fn setup(app: &mut App) -> std::result::Result<(), Box<dyn std::error::Error
     
     let app = app.handle();
     tauri::async_runtime::spawn(async move {
-      info!("main_window:");
+      log::info!("main_window:");
       let mut main_win = WindowBuilder::new(&app, "core", WindowUrl::App("index.html".into()))
         .title("ChatGPT-Tauri")
         .resizable(true)
