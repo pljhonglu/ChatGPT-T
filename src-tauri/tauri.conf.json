@@ -26,14 +26,18 @@
       "http": {
         "all": true,
         "request": true,
-        "scope": ["https://api.openai.com/v1/*"]
+        "scope": [
+          "https://api.openai.com/v1/*"
+        ]
       },
       "shell": {
         "open": true
       },
       "fs": {
         "all": true,
-        "scope": ["$DOWNLOAD/*"]
+        "scope": [
+          "$DOWNLOAD/*"
+        ]
       },
       "path": {
         "all": true
