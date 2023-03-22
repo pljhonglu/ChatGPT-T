@@ -68,6 +68,8 @@ jobs:
           args: --target ${{ matrix.target }}
 
   updater:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     needs: publish-tauri
 
