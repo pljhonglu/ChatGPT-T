@@ -1,7 +1,7 @@
 {
   "version": "v0.1.2",
   "notes": "feat:\n\n- 支持选择模型\n- 支持设置代理\n\nfix：\n\n- 修复windows点击x号无法关闭的问题",
-  "pub_date": "2023-03-22T04:09:31.361Z",
+  "pub_date": "2023-03-22T06:53:09.364Z",
   "platforms": {
     "win64": {
       "signature": "",
