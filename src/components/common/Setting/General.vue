@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NButton, NPopconfirm, NSelect, useMessage } from 'naive-ui'
+import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
 import type { Language, Theme } from '@/store/modules/app/helper'
 import { SvgIcon } from '@/components/common'
 import { useAppStore } from '@/store'
@@ -97,6 +98,12 @@ function handleImportButtonClick(): void {
   if (fileInput)
     fileInput.click()
 }
+
+async function checkAppUpdate() {
+  const update = await checkUpdate()
+  if (update.shouldUpdate)
+    await installUpdate()
+}
 </script>
 
 <template>
@@ -162,6 +169,17 @@ function handleImportButtonClick(): void {
             :options="languageOptions"
             @update-value="value => appStore.setLanguage(value)"
           />
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span class="flex-shrink-0 w-[100px]">更新</span>
+        <div class="flex flex-wrap items-center gap-4">
+          <NButton size="small" @click="checkAppUpdate">
+            <template #icon>
+              <SvgIcon icon="ri:download-2-fill" />
+            </template>
+            检查更新
+          </NButton>
         </div>
       </div>
     </div>
