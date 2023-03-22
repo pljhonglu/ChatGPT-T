@@ -1,11 +1,19 @@
 <script setup lang='ts'>
+import { onMounted, ref } from 'vue'
+import { getVersion } from '@tauri-apps/api/app'
 import pkg from '@/../package.json'
+
+const version = ref<string>('')
+
+onMounted(async () => {
+  version.value = await getVersion()
+})
 </script>
 
 <template>
   <div class="p-4 space-y-4">
     <h2 class="text-xl font-bold">
-      Version - {{ pkg.version }}
+      Version: v{{ version }}
     </h2>
     <div class="p-2 space-y-2 rounded-md bg-neutral-100 dark:bg-neutral-700">
       <p>

@@ -84,6 +84,7 @@
     },
     "updater": {
       "active": true,
+      "dialog": true,
       "endpoints": [
         "https://pljhonglu.github.io/ChatGPT-T/install.json"
       ],
