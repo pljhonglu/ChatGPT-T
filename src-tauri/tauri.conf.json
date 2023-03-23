@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "ChatGPT-Tauri",
-    "version": "0.1.3"
+    "version": "0.1.2"
   },
   "tauri": {
     "allowlist": {
@@ -44,6 +44,11 @@
       },
       "dialog": {
         "all": true
+      },
+      "process": {
+        "all": false,
+        "relaunch": true,
+        "exit": true
       }
     },
     "bundle": {
@@ -84,7 +89,7 @@
     },
     "updater": {
       "active": true,
-      "dialog": true,
+      "dialog": false,
       "endpoints": [
         "https://pljhonglu.github.io/ChatGPT-T/install.json"
       ],

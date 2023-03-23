@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { NButton, NPopconfirm, NSelect, useMessage } from 'naive-ui'
 import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
+import { relaunch } from '@tauri-apps/api/process'
 import type { Language, Theme } from '@/store/modules/app/helper'
 import { SvgIcon } from '@/components/common'
 import { useAppStore } from '@/store'
@@ -99,10 +100,26 @@ function handleImportButtonClick(): void {
     fileInput.click()
 }
 
+const updateLoading = ref<boolean>(false)
+
 async function checkAppUpdate() {
-  const update = await checkUpdate()
-  if (update.shouldUpdate)
-    await installUpdate()
+  const update_info = await checkUpdate()
+  if (update_info.shouldUpdate) {
+    try {
+      ms.info('发现新版本，正在更新...')
+      updateLoading.value = true
+      await installUpdate()
+      await relaunch()
+      updateLoading.value = false
+    }
+    catch (error) {
+      updateLoading.value = false
+      ms.error(error as string)
+    }
+  }
+  else {
+    ms.info('当前是最新版本！')
+  }
 }
 </script>
 
@@ -174,7 +191,7 @@ async function checkAppUpdate() {
       <div class="flex items-center space-x-4">
         <span class="flex-shrink-0 w-[100px]">更新</span>
         <div class="flex flex-wrap items-center gap-4">
-          <NButton size="small" @click="checkAppUpdate">
+          <NButton size="small" :loading="updateLoading" :disabled="updateLoading" @click="checkAppUpdate">
             <template #icon>
               <SvgIcon icon="ri:download-2-fill" />
             </template>
