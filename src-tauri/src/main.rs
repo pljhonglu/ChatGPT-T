@@ -7,6 +7,7 @@ mod app;
 mod utils;
 
 use app::{builder, cmd};
+use tauri::Manager;
 use tauri_plugin_log::{
   fern::colors::{Color, ColoredLevelConfig},
   LogTarget,
@@ -38,7 +39,8 @@ fn main() {
   .plugin(log.build())
   .invoke_handler(tauri::generate_handler![
     cmd::gpt::fetch_chat_api,
-    cmd::download::download_img
+    cmd::download::download_img,
+    cmd::window::new_window
   ])
   .setup(builder::setup);
 
@@ -50,6 +52,7 @@ fn main() {
         if win.label() == "core" {
           win.minimize().unwrap();
         }else {
+          cmd::window::window_reload(event.window().app_handle(), "core");
           event.window().close().unwrap();
         }
         api.prevent_close();

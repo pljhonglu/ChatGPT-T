@@ -84,7 +84,7 @@ function saveUserInfo() {
 </script>
 
 <template>
-  <div class="p-4 space-y-5 min-h-[200px]">
+  <div class="p-4 space-y-5 min-h-[200px] max-h-80 overflow-auto">
     <NForm ref="formRef" :model="model" :rules="rules">
       <NFormItem path="avatar" :label="$t('setting.avatarLink')">
         <NInput v-model:value="model.avatar" :placeholder="$t('setting.avatarLinkPlaceholder')" />

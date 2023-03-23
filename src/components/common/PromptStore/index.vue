@@ -15,29 +15,11 @@ interface DataProps {
   value: string
 }
 
-interface Props {
-  visible: boolean
-}
-
-interface Emit {
-  (e: 'update:visible', visible: boolean): void
-}
-
-const props = defineProps<Props>()
-
-const emit = defineEmits<Emit>()
-
 const message = useMessage()
-
-const show = computed({
-  get: () => props.visible,
-  set: (visible: boolean) => emit('update:visible', visible),
-})
 
 const showModal = ref(false)
 
 const importLoading = ref(false)
-const exportLoading = ref(false)
 
 const searchValue = ref<string>('')
 
@@ -193,20 +175,6 @@ const importPromptTemplate = () => {
   }
 }
 
-// 模板导出
-const exportPromptTemplate = () => {
-  exportLoading.value = true
-  const jsonDataStr = JSON.stringify(promptList.value)
-  const blob = new Blob([jsonDataStr], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'ChatGPTPromptTemplate.json'
-  link.click()
-  URL.revokeObjectURL(url)
-  exportLoading.value = false
-}
-
 // 模板在线导入
 const downloadPromptTemplate = async () => {
   try {
@@ -326,113 +294,104 @@ const dataSource = computed(() => {
 
 <template>
   <NMessageProvider>
-    <NModal v-model:show="show" style="width: 90%; max-width: 900px;" preset="card">
-      <div class="space-y-4">
-        <NTabs type="segment">
-          <NTabPane name="local" :tab="$t('store.local')">
-            <div
-              class="flex gap-3"
-              :class="[isMobile ? 'flex-col' : 'flex-row justify-between']"
-            >
-              <div class="flex items-center space-x-4">
-                <NButton
-                  type="primary"
-                  size="small"
-                  @click="changeShowModal('add')"
-                >
-                  {{ $t('common.add') }}
-                </NButton>
-                <NButton
-                  size="small"
-                  @click="changeShowModal('local_import')"
-                >
-                  {{ $t('common.import') }}
-                </NButton>
-                <NButton
-                  size="small"
-                  :loading="exportLoading"
-                  @click="exportPromptTemplate()"
-                >
-                  {{ $t('common.export') }}
-                </NButton>
-                <NPopconfirm @positive-click="clearPromptTemplate">
-                  <template #trigger>
-                    <NButton size="small">
-                      {{ $t('common.clear') }}
-                    </NButton>
-                  </template>
-                  {{ $t('store.clearStoreConfirm') }}
-                </NPopconfirm>
-              </div>
-              <div class="flex items-center">
-                <NInput v-model:value="searchValue" style="width: 100%" />
-              </div>
-            </div>
-            <br>
-            <NDataTable
-              :max-height="400"
-              :columns="columns"
-              :data="dataSource"
-              :pagination="pagination"
-              :bordered="false"
-            />
-          </NTabPane>
-          <NTabPane name="download" :tab="$t('store.online')">
-            <p class="mb-4">
-              {{ $t('store.onlineImportWarning') }}
-            </p>
-            <div class="flex items-center gap-4">
-              <NInput v-model:value="downloadURL" placeholder="" />
+    <div class="space-y-4">
+      <NTabs type="segment">
+        <NTabPane name="local" :tab="$t('store.local')">
+          <div
+            class="flex gap-3"
+            :class="[isMobile ? 'flex-col' : 'flex-row justify-between']"
+          >
+            <div class="flex items-center space-x-4">
               <NButton
-                strong
-                secondary
-                :disabled="downloadDisabled"
-                :loading="importLoading"
-                @click="downloadPromptTemplate()"
+                type="primary"
+                size="small"
+                @click="changeShowModal('add')"
               >
-                {{ $t('common.download') }}
+                {{ $t('common.add') }}
               </NButton>
-            </div>
-            <NDivider />
-            <NLayoutContent
-              style="height: 360px"
-              content-style="background: none;"
-              :native-scrollbar="false"
-            >
-              <NCard
-                v-for="info in promptRecommendList"
-                :key="info.key" :title="info.key"
-                style="margin: 5px;"
-                embedded
-                :bordered="true"
+              <NButton
+                size="small"
+                @click="changeShowModal('local_import')"
               >
-                <p
-                  class="overflow-hidden text-ellipsis whitespace-nowrap"
-                  :title="info.desc"
-                >
-                  {{ info.desc }}
-                </p>
-                <template #footer>
-                  <div class="flex items-center justify-end space-x-4">
-                    <NButton text>
-                      <a
-                        :href="info.url"
-                        target="_blank"
-                      >
-                        <SvgIcon class="text-xl" icon="ri:link" />
-                      </a>
-                    </NButton>
-                    <NButton text @click="setDownloadURL(info.downloadUrl) ">
-                      <SvgIcon class="text-xl" icon="ri:add-fill" />
-                    </NButton>
-                  </div>
+                {{ $t('common.import') }}
+              </NButton>
+              <NPopconfirm @positive-click="clearPromptTemplate">
+                <template #trigger>
+                  <NButton size="small">
+                    {{ $t('common.clear') }}
+                  </NButton>
                 </template>
-              </NCard>
-            </NLayoutContent>
-          </NTabPane>
-        </NTabs>
-      </div>
-    </NModal>
+                {{ $t('store.clearStoreConfirm') }}
+              </NPopconfirm>
+            </div>
+            <div class="flex items-center">
+              <NInput v-model:value="searchValue" style="width: 100%" />
+            </div>
+          </div>
+          <br>
+          <NDataTable
+            :max-height="320"
+            :columns="columns"
+            :data="dataSource"
+            :pagination="pagination"
+            :bordered="false"
+          />
+        </NTabPane>
+        <NTabPane name="download" :tab="$t('store.online')">
+          <p class="mb-4">
+            {{ $t('store.onlineImportWarning') }}
+          </p>
+          <div class="flex items-center gap-4">
+            <NInput v-model:value="downloadURL" placeholder="" />
+            <NButton
+              strong
+              secondary
+              :disabled="downloadDisabled"
+              :loading="importLoading"
+              @click="downloadPromptTemplate()"
+            >
+              {{ $t('common.download') }}
+            </NButton>
+          </div>
+          <NDivider />
+          <NLayoutContent
+            :max-height="320"
+            content-style="background: none;"
+            :native-scrollbar="false"
+          >
+            <NCard
+              v-for="info in promptRecommendList"
+              :key="info.key" :title="info.key"
+              style="margin: 5px;"
+              embedded
+              :bordered="true"
+            >
+              <p
+                class="overflow-hidden text-ellipsis whitespace-nowrap"
+                :title="info.desc"
+              >
+                {{ info.desc }}
+              </p>
+              <template #footer>
+                <div class="flex items-center justify-end space-x-4">
+                  <NButton text>
+                    <a
+                      :href="info.url"
+                      target="_blank"
+                    >
+                      <SvgIcon class="text-xl" icon="ri:link" />
+                    </a>
+                  </NButton>
+                  <NButton text @click="setDownloadURL(info.downloadUrl) ">
+                    <SvgIcon class="text-xl" icon="ri:add-fill" />
+                  </NButton>
+                </div>
+              </template>
+            </NCard>
+          </NLayoutContent>
+        </NTabPane>
+      </NTabs>
+    </div>
     <NModal v-model:show="showModal" style="width: 90%; max-width: 600px;" preset="card">
       <NSpace v-if="modalMode === 'add' || modalMode === 'modify'" vertical>
         {{ t('store.title') }}

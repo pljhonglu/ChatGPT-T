@@ -2,6 +2,7 @@ import type { App } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { ChatLayout } from '@/views/chat/layout'
+import { WindowLayout } from '@/views/window'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -17,7 +18,19 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
-
+  {
+    path: '/window',
+    name: 'Window',
+    component: WindowLayout,
+    redirect: '/window',
+    children: [
+      {
+        path: '/window/prompt-store',
+        name: 'PromptStore',
+        component: () => import('@/components/common/PromptStore/index.vue'),
+      },
+    ],
+  },
   {
     path: '/404',
     name: '404',

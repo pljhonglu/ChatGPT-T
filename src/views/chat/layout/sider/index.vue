@@ -1,18 +1,17 @@
 <script setup lang='ts'>
 import type { CSSProperties } from 'vue'
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { NButton, NLayoutSider } from 'naive-ui'
+import { tauri } from '@tauri-apps/api'
 import List from './List.vue'
 import Footer from './Footer.vue'
 import { useAppStore, useChatStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { PromptStore } from '@/components/common'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()
 
 const { isMobile } = useBasicLayout()
-const show = ref(false)
 
 const collapsed = computed(() => appStore.siderCollapsed)
 
@@ -24,6 +23,14 @@ function handleAdd(event: Event) {
 
 function handleUpdateCollapsed() {
   appStore.setSiderCollapsed(!collapsed.value)
+}
+
+function showPromptStore() {
+  tauri.invoke('new_window', {
+    label: 'prompt_store',
+    title: 'Ptompt Store',
+    url: '/#/window/prompt-store',
+  })
 }
 
 const getMobileClass = computed<CSSProperties>(() => {
@@ -80,7 +87,7 @@ watch(
           <List />
         </div>
         <div class="p-4">
-          <NButton block @click="show = true">
+          <NButton block @click="showPromptStore">
             {{ $t('sider.promptStore') }}
           </NButton>
         </div>
@@ -91,5 +98,4 @@ watch(
   <template v-if="isMobile">
     <div v-show="!collapsed" class="fixed inset-0 z-40 bg-black/40" @click="handleUpdateCollapsed" />
   </template>
-  <PromptStore v-model:visible="show" />
 </template>
