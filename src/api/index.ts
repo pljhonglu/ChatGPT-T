@@ -47,8 +47,10 @@ export async function fetchChatAPIProcess(
   if (signal) {
     signal.onabort = () => {
       handlers.delete(id)
-      if (errorHandle)
+      if (errorHandle) {
         errorHandle(new Error('canceled'))
+        errorHandle = undefined
+      }
     }
   }
   await invoke('fetch_chat_api', {
@@ -57,8 +59,10 @@ export async function fetchChatAPIProcess(
     option,
   }).catch((error) => {
     handlers.delete(id)
-    if (errorHandle)
+    if (errorHandle) {
       errorHandle(new Error(error))
+      errorHandle = undefined
+    }
   })
   handlers.delete(id)
 }
