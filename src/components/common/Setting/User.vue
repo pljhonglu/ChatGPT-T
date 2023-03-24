@@ -9,13 +9,14 @@ const userStore = useUserStore()
 const ms = useMessage()
 const formRef = ref<FormInst | null>(null)
 const userInfo = computed(() => userStore.userInfo)
+const userConfig = computed(() => userStore.userConfig)
 
 const model = ref({
   name: userInfo.value.name,
   avatar: userInfo.value.avatar,
-  apiKey: userInfo.value.apiKey,
-  modelName: userInfo.value.modelName,
-  proxy: userInfo.value.proxy,
+  apiKey: userConfig.value.apiKey,
+  modelName: userConfig.value.modelName,
+  proxy: userConfig.value.proxy,
 })
 
 const models = userStore.allModels().map(v => ({
@@ -71,13 +72,12 @@ function saveUserInfo() {
     if (!errors) {
       userInfo.value.name = model.value.name
       userInfo.value.avatar = model.value.avatar
-      userInfo.value.apiKey = model.value.apiKey
-      userInfo.value.modelName = model.value.modelName
-      userInfo.value.proxy = model.value.proxy
+      userConfig.value.apiKey = model.value.apiKey
+      userConfig.value.modelName = model.value.modelName
+      userConfig.value.proxy = model.value.proxy
 
       userStore.recordState()
       ms.success(t('common.success'))
-      // window.location.reload()
     }
   })
 }

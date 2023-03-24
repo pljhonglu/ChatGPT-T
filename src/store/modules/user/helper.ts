@@ -6,13 +6,18 @@ const LOCAL_NAME = 'userStorage'
 export interface UserInfo {
   avatar: string
   name: string | null
+}
+
+export interface UserConfig {
   modelName: string
   apiKey: string
   proxy: string | null
+  maxTokenNum: number
 }
 
 export interface UserState {
   userInfo: UserInfo
+  userConfig: UserConfig
 }
 
 export function defaultSetting(): UserState {
@@ -20,9 +25,12 @@ export function defaultSetting(): UserState {
     userInfo: {
       avatar: '',
       name: null,
+    },
+    userConfig: {
       modelName: 'gpt-3.5-turbo',
       apiKey: import.meta.env.VITE_GLOB_OPENAI_KEY,
       proxy: null,
+      maxTokenNum: 4096,
     },
   }
 }

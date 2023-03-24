@@ -4,7 +4,7 @@ use eventsource_stream::{Eventsource, EventStreamError};
 use serde_json::{json, Value};
 use serde::{ser::Serializer, Serialize, Deserialize};
 use futures::{TryStreamExt};
-use std::{collections::HashMap, time::Duration};
+use std::{ time::Duration };
 use log::{error, info};
 
 type Result<T> = std::result::Result<T, Error>;
@@ -46,26 +46,39 @@ impl ProgressPayload {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Message {
+    pub role: String,
+    pub content: String
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[allow(non_snake_case)]
+pub struct FetchOption {
+    pub proxy: Option<String>,
+    pub apiKey: String,
+    pub model: String,
+    pub temperature: f32,
+}
+
 #[tauri::command]
 pub async fn fetch_chat_api(
     handle: AppHandle,
     id: u64,
-    proxy: Option<String>,
-    token: String,
-    model: String,
-    messages: Vec<HashMap<String, String>>,
-    temperature: f32
+    messages: Vec<Message>,
+    option: FetchOption,
 ) -> Result<u64> {
     // https://platform.openai.com/docs/guides/chat/introduction
     // "https://api.openai.com/v1/chat/completions";
     let url = "https://api.openai.com/v1/chat/completions";
     let data = json!({
-        "model": model,
+        "model": option.model,
         "messages": messages,
-        "temperature": temperature,
-        "stream": true
+        "temperature": option.temperature,
+        "stream": true,
     });
-    let proxy_str = proxy.unwrap_or(String::from(""));
+    log::info!("> send message: length: {}, option: {:?},", messages.len(), option);
+    let proxy_str = option.proxy.unwrap_or(String::from(""));
 
     let client : reqwest::Client = {
         log::info!("proxy is: {}", proxy_str);
@@ -78,15 +91,18 @@ pub async fn fetch_chat_api(
     };
     let res = client.post(url)
         .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {}", token))
-        .timeout(Duration::from_secs(300))
+        .header("Authorization", format!("Bearer {}", option.apiKey))
+        .timeout(Duration::from_secs(600))
         .body(data.to_string())
         .send()
         .await?;
-    info!("send message: {}", json!(messages));
+    info!("> receive message: {}", id);
     
-    if res.status().as_u16() != 200 {
-        return Err(Error::Custom {code: res.status().as_u16(), msg:String::from("openai api request error!")})
+    let status_code = res.status().as_u16();
+    if status_code != 200 {
+        let error_msg = res.text().await?;
+        log::error!("{}", error_msg);
+        return Err(Error::Custom {code: status_code, msg:String::from(error_msg)})
     }
 
     let mut stream = res.bytes_stream().eventsource();

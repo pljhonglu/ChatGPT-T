@@ -1,8 +1,10 @@
 declare namespace Chat {
 
+	// 一条聊天消息
 	interface Chat {
 		dateTime: string
 		text: string
+		tokenNum?: number
 		inversion?: boolean
 		error?: boolean
 		loading?: boolean
@@ -14,26 +16,29 @@ declare namespace Chat {
 		uuid: number
 	}
 
+	interface ChatOptions {
+		apiKey: string
+		proxy: string | null
+		model: string
+		systemMessage: string
+		temperature: number
+	}
+
+	// 一个聊天会话
+	interface ChatSession {
+		uuid: number 
+		data: Chat[]
+		opt: Partial<ChatOptions>
+	}
+
 	interface ChatState {
 		active: number | null
 		history: History[]
-		chat: { uuid: number; data: Chat[] }[]
+		chat: ChatSession[]
 	}
 
 	interface RequestMessage {
 		role: string
 		content: string
 	}
-
-	// interface ConversationRequest {
-	// 	conversationId?: string
-	// 	parentMessageId?: string
-	// }
-
-	// interface ConversationResponse {
-	// 	options: ConversationRequest,
-	// 	detail: string,
-	// 	role: string,
-	// 	finish_reason: string,
-	// }
 }

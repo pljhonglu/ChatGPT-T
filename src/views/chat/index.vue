@@ -13,7 +13,7 @@ import { useUsingContext } from './hooks/useUsingContext'
 import HeaderComponent from './components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { useChatStore, usePromptStore, useUserStore } from '@/store'
+import { useChatStore, usePromptStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
 
@@ -24,19 +24,17 @@ const dialog = useDialog()
 const ms = useMessage()
 
 const chatStore = useChatStore()
-const userStore = useUserStore()
-const userInfo = computed(() => userStore.userInfo)
 
 useCopyCode()
 
 const { isMobile } = useBasicLayout()
-const { addChat, updateChat, updateChatSome } = useChat()
+const { addChat, updateChat, updateChatSome, getSessionConfig, buildRequestMessages } = useChat()
 const { scrollRef, scrollToBottom } = useScroll()
 const { usingContext, toggleUsingContext } = useUsingContext()
 
 const { uuid } = route.params as { uuid: string }
 
-const dataSources = computed(() => chatStore.getChatByUuid(+uuid))
+const dataSources = computed(() => chatStore.getChatDataByUuid(+uuid))
 // const conversationList = computed(() => dataSources.value.filter(item => (!item.inversion && !item.error)))
 
 const prompt = ref<string>('')
@@ -51,25 +49,10 @@ function handleSubmit() {
   onConversation()
 }
 
-function generateMessages(index: number) {
-  const messages: Chat.RequestMessage[] = []
-  const ds = dataSources.value
-  if (usingContext.value) {
-    const allData = ds.slice(0, index + 1)
-    allData.forEach((item) => {
-      messages.push({ role: item.inversion ? 'user' : 'assistant', content: item.text })
-    })
-  }
-  else {
-    const data = ds[index]
-    messages.push({ role: 'user', content: data.text })
-  }
-  return messages
-}
-
 async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, index: number) {
-  const api_key = userInfo.value.apiKey
-  if (!api_key || api_key.trim() === '') {
+  const option = getSessionConfig(uuid)
+  const apiKey = option.apiKey
+  if (!apiKey || apiKey.trim() === '') {
     ms.error('请先设置 api key')
     return
   }
@@ -77,10 +60,8 @@ async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, i
 
   let lastText = ''
   await fetchChatAPIProcess(
-    api_key,
-    userInfo.value.proxy,
-    userInfo.value.modelName,
     messages,
+    option,
     (detail: string, _: string) => {
       lastText = lastText + detail ?? ''
       updateChat(+uuid, index,
@@ -92,6 +73,7 @@ async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, i
           loading: false,
         },
       )
+      scrollToBottom()
     },
     (error: Error) => {
       const errorMessage = error?.message ?? t('common.wrong')
@@ -140,7 +122,7 @@ async function onConversation() {
 
   loading.value = true
   prompt.value = ''
-  const messages: Chat.RequestMessage[] = generateMessages(dataSources.value.length - 1)
+  const messages: Chat.RequestMessage[] = await buildRequestMessages(+uuid, dataSources.value.length - 1)
   addChat(
     +uuid,
     {
@@ -162,7 +144,7 @@ async function onRegenerate(index: number) {
   if (loading.value)
     return
 
-  const messages = generateMessages(index)
+  const messages = await buildRequestMessages(+uuid, index)
   if (!messages || messages.length === 0)
     return
 

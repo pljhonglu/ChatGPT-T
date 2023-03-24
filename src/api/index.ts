@@ -27,10 +27,8 @@ async function listenToEventIfNeeded(): Promise<void> {
 }
 
 export async function fetchChatAPIProcess(
-  apiKey: string,
-  proxy: string | null,
-  modelName: string,
   messages: Chat.RequestMessage[],
+  option: Chat.ChatOptions,
   progressHandler?: (detail: string, role: string) => void,
   errorHandle?: (err: Error) => void,
   signal?: GenericAbortSignal,
@@ -55,11 +53,8 @@ export async function fetchChatAPIProcess(
   }
   await invoke('fetch_chat_api', {
     id,
-    proxy,
-    token: apiKey,
-    model: modelName,
     messages,
-    temperature: 0.6,
+    option,
   }).catch((error) => {
     handlers.delete(id)
     if (errorHandle)
