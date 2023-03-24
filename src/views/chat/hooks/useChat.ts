@@ -29,6 +29,7 @@ export function useChat() {
 
     const defaultOpt = {
       apiKey: userStore.userConfig.apiKey,
+      host: userStore.userConfig.host,
       proxy: userStore.userConfig.proxy,
       model: userStore.userConfig.modelName,
       systemMessage: _getDefaultSystemMessage(),

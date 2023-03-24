@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { NAutoComplete, NButton, NInput, useDialog, useMessage } from 'naive-ui'
+import { NAutoComplete, NButton, NInput, useDialog, useMessage, useNotification } from 'naive-ui'
 import html2canvas from 'html2canvas'
 import { invoke } from '@tauri-apps/api'
 import { Message } from './components'
@@ -17,6 +17,7 @@ import { useChatStore, usePromptStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
 
+const notification = useNotification()
 let controller = new AbortController()
 
 const route = useRoute()
@@ -85,7 +86,9 @@ async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, i
         )
       }
       else {
-        ms.error(errorMessage)
+        notification.error({
+          content: errorMessage,
+        })
         updateChat(+uuid, index,
           {
             dateTime: new Date().toLocaleString(),

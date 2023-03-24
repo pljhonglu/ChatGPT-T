@@ -11,6 +11,7 @@ export interface UserInfo {
 export interface UserConfig {
   modelName: string
   apiKey: string
+  host: string
   proxy: string | null
   maxTokenNum: number
 }
@@ -30,6 +31,7 @@ export function defaultSetting(): UserState {
       modelName: 'gpt-3.5-turbo',
       apiKey: import.meta.env.VITE_GLOB_OPENAI_KEY,
       proxy: null,
+      host: 'https://api.openai.com/v1/chat/completions',
       maxTokenNum: 4096,
     },
   }

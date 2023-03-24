@@ -4,7 +4,7 @@ use eventsource_stream::{Eventsource, EventStreamError};
 use serde_json::{json, Value};
 use serde::{ser::Serializer, Serialize, Deserialize};
 use futures::{TryStreamExt};
-use std::{ time::Duration };
+use std::{ time::Duration, env::consts::OS };
 use log::{error, info};
 
 type Result<T> = std::result::Result<T, Error>;
@@ -56,6 +56,7 @@ pub struct Message {
 #[allow(non_snake_case)]
 pub struct FetchOption {
     pub proxy: Option<String>,
+    pub host: String,
     pub apiKey: String,
     pub model: String,
     pub temperature: f32,
@@ -69,8 +70,7 @@ pub async fn fetch_chat_api(
     option: FetchOption,
 ) -> Result<u64> {
     // https://platform.openai.com/docs/guides/chat/introduction
-    // "https://api.openai.com/v1/chat/completions";
-    let url = "https://api.openai.com/v1/chat/completions";
+    // let url = "https://api.openai.com/v1/chat/completions";
     let data = json!({
         "model": option.model,
         "messages": messages,
@@ -89,9 +89,10 @@ pub async fn fetch_chat_api(
         }
         client_builder.build().unwrap()
     };
-    let res = client.post(url)
+    let res = client.post(option.host)
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Bearer {}", option.apiKey))
+        .header(reqwest::header::USER_AGENT, format!("ChatGPT-Tauri ({})", OS))
         .timeout(Duration::from_secs(600))
         .body(data.to_string())
         .send()

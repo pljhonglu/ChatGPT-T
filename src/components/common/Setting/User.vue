@@ -16,6 +16,7 @@ const model = ref({
   avatar: userInfo.value.avatar,
   apiKey: userConfig.value.apiKey,
   modelName: userConfig.value.modelName,
+  host: userConfig.value.host,
   proxy: userConfig.value.proxy,
 })
 
@@ -65,6 +66,21 @@ const rules: FormRules = {
       trigger: ['input', 'blur'],
     },
   ],
+  host: [
+    {
+      required: true,
+      message: '请输入openai api host',
+      validator(rule: FormItemRule, value: string) {
+        if (!value)
+          return new Error('不能为空')
+        else if (!/^https:\/\/\S+$/.test(value))
+          return new Error('请输入正确的host')
+
+        return true
+      },
+      trigger: ['input', 'blur'],
+    },
+  ],
 }
 
 function saveUserInfo() {
@@ -75,7 +91,7 @@ function saveUserInfo() {
       userConfig.value.apiKey = model.value.apiKey
       userConfig.value.modelName = model.value.modelName
       userConfig.value.proxy = model.value.proxy
-
+      userConfig.value.host = model.value.host
       userStore.recordState()
       ms.success(t('common.success'))
     }
@@ -97,6 +113,9 @@ function saveUserInfo() {
       </NFormItem>
       <NFormItem path="modelName" label="Model Name">
         <NSelect v-model:value="model.modelName" placeholder="Select" :options="models" />
+      </NFormItem>
+      <NFormItem path="host" label="Host">
+        <NInput v-model:value="model.host" placeholder="" />
       </NFormItem>
       <NFormItem path="proxy" label="Proxy">
         <NInput v-model:value="model.proxy" placeholder="socks5://127.0.0.1:7890" />
