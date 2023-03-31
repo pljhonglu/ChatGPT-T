@@ -19,7 +19,7 @@ pub fn setup(app: &mut App) -> std::result::Result<(), Box<dyn std::error::Error
         .title("ChatGPT-Tauri")
         .resizable(true)
         .fullscreen(false)
-        .inner_size(800.0, 600.0);
+        .inner_size(1000.0, 800.0);
 
       #[cfg(target_os = "macos")]
       {

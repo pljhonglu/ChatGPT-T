@@ -11,12 +11,14 @@ const formRef = ref<FormInst | null>(null)
 const userInfo = computed(() => userStore.userInfo)
 const userConfig = computed(() => userStore.userConfig)
 
+const hostUrl = new URL(userConfig.value.host)
+
 const model = ref({
   name: userInfo.value.name,
   avatar: userInfo.value.avatar,
   apiKey: userConfig.value.apiKey,
   modelName: userConfig.value.modelName,
-  host: userConfig.value.host,
+  host: `${hostUrl.protocol}//${hostUrl.host}`,
   proxy: userConfig.value.proxy,
 })
 
@@ -73,7 +75,7 @@ const rules: FormRules = {
       validator(rule: FormItemRule, value: string) {
         if (!value)
           return new Error('不能为空')
-        else if (!/^https:\/\/\S+$/.test(value))
+        else if (!/^https:\/\/([a-z0-9\-]+\.)+[a-z]{2,}$/i.test(value))
           return new Error('请输入正确的host')
 
         return true
@@ -86,12 +88,14 @@ const rules: FormRules = {
 function saveUserInfo() {
   formRef.value?.validate((errors) => {
     if (!errors) {
+      const hostUrl = new URL(userConfig.value.host)
+
       userInfo.value.name = model.value.name
       userInfo.value.avatar = model.value.avatar
       userConfig.value.apiKey = model.value.apiKey
       userConfig.value.modelName = model.value.modelName
       userConfig.value.proxy = model.value.proxy
-      userConfig.value.host = model.value.host
+      userConfig.value.host = `${hostUrl.protocol}//${hostUrl.host}`
       userStore.recordState()
       ms.success(t('common.success'))
     }

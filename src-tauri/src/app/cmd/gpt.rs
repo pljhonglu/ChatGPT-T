@@ -1,5 +1,5 @@
 use tauri::{AppHandle, Manager};
-use reqwest;
+use reqwest::{self, Url};
 use eventsource_stream::{Eventsource, EventStreamError};
 use serde_json::{json, Value};
 use serde::{ser::Serializer, Serialize, Deserialize};
@@ -89,7 +89,10 @@ pub async fn fetch_chat_api(
         }
         client_builder.build().unwrap()
     };
-    let res = client.post(option.host)
+
+    let api_url = Url::parse(&option.host).unwrap().join("/v1/chat/completions").unwrap().as_str().to_owned();
+
+    let res = client.post(api_url)
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Bearer {}", option.apiKey))
         .header(reqwest::header::USER_AGENT, format!("ChatGPT-Tauri ({})", OS))

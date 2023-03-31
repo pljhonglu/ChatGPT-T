@@ -27,9 +27,11 @@ export function useChat() {
     const session = chatStore.getChatSessionByUuid(uuid)
     const opt = session?.opt
 
+    const hostUrl = new URL(userStore.userConfig.host)
+    const host = `${hostUrl.protocol}//${hostUrl.host}`
     const defaultOpt = {
       apiKey: userStore.userConfig.apiKey,
-      host: userStore.userConfig.host,
+      host,
       proxy: userStore.userConfig.proxy,
       model: userStore.userConfig.modelName,
       systemMessage: _getDefaultSystemMessage(),
