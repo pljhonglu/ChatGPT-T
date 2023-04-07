@@ -66,7 +66,7 @@ export function useChat() {
       if (tokenTotalNum >= MaxTokenNumber)
         break
 
-      messages.unshift({ role: chat.inversion ? 'user' : 'assistant', content: chat.text })
+      messages.unshift({ role: chat.rule, content: chat.text })
       currentIndex -= 1
     }
     // add last message

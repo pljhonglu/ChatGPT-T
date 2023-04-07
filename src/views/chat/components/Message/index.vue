@@ -11,7 +11,7 @@ import { t } from '@/locales'
 interface Props {
   dateTime?: string
   text?: string
-  inversion?: boolean
+  isBot?: boolean
   error?: boolean
   loading?: boolean
 }
@@ -58,37 +58,37 @@ function handleRegenerate() {
 </script>
 
 <template>
-  <div class="flex w-full mb-6 overflow-hidden" :class="[{ 'flex-row-reverse': inversion }]">
+  <div class="flex w-full mb-6 overflow-hidden" :class="[{ 'flex-row-reverse': !isBot }]">
     <div
       class="flex items-center justify-center flex-shrink-0 h-8 overflow-hidden rounded-full basis-8"
-      :class="[inversion ? 'ml-2' : 'mr-2']"
+      :class="[isBot ? 'mr-2' : 'ml-2']"
     >
-      <AvatarComponent :image="inversion" />
+      <AvatarComponent :image="!isBot" />
     </div>
-    <div class="overflow-hidden text-sm " :class="[inversion ? 'items-end' : 'items-start']">
-      <p class="text-xs text-[#b4bbc4]" :class="[inversion ? 'text-right' : 'text-left']">
+    <div class="overflow-hidden text-sm " :class="[isBot ? 'items-start' : 'items-end']">
+      <p class="text-xs text-[#b4bbc4]" :class="[isBot ? 'text-left' : 'text-right']">
         {{ dateTime }}
       </p>
       <div
         class="flex items-end gap-1 mt-2"
-        :class="[inversion ? 'flex-row-reverse' : 'flex-row']"
+        :class="[isBot ? 'flex-row' : 'flex-row-reverse']"
       >
         <TextComponent
           ref="textRef"
-          :inversion="inversion"
+          :is-bot="isBot"
           :error="error"
           :text="text"
           :loading="loading"
         />
         <div class="flex flex-col">
           <button
-            v-if="!inversion"
+            v-if="isBot"
             class="mb-2 transition text-neutral-300 hover:text-neutral-800 dark:hover:text-neutral-300"
             @click="handleRegenerate"
           >
             <SvgIcon icon="ri:restart-line" />
           </button>
-          <NDropdown :placement="!inversion ? 'right' : 'left'" :options="options" @select="handleSelect">
+          <NDropdown :placement="isBot ? 'right' : 'left'" :options="options" @select="handleSelect">
             <button class="transition text-neutral-300 hover:text-neutral-800 dark:hover:text-neutral-200">
               <SvgIcon icon="ri:more-2-fill" />
             </button>

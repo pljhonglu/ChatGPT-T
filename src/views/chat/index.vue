@@ -13,7 +13,7 @@ import { useUsingContext } from './hooks/useUsingContext'
 import HeaderComponent from './components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { useChatStore, usePromptStore } from '@/store'
+import { ChatRule, useChatStore, usePromptStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
 
@@ -36,7 +36,6 @@ const { usingContext, toggleUsingContext } = useUsingContext()
 const { uuid } = route.params as { uuid: string }
 
 const dataSources = computed(() => chatStore.getChatDataByUuid(+uuid))
-// const conversationList = computed(() => dataSources.value.filter(item => (!item.inversion && !item.error)))
 
 const prompt = ref<string>('')
 const loading = ref<boolean>(false)
@@ -45,10 +44,6 @@ const loading = ref<boolean>(false)
 const promptStore = usePromptStore()
 // 使用storeToRefs，保证store修改后，联想部分能够重新渲染
 const { promptList: promptTemplate } = storeToRefs<any>(promptStore)
-
-function handleSubmit() {
-  onConversation()
-}
 
 async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, index: number) {
   const option = getSessionConfig(uuid)
@@ -69,7 +64,7 @@ async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, i
         {
           dateTime: new Date().toLocaleString(),
           text: lastText,
-          inversion: false,
+          rule: ChatRule.Assistant,
           error: false,
           loading: false,
         },
@@ -93,7 +88,7 @@ async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, i
           {
             dateTime: new Date().toLocaleString(),
             text: t('common.wrong'),
-            inversion: false,
+            rule: ChatRule.Assistant,
             error: true,
             loading: false,
           },
@@ -103,7 +98,7 @@ async function fetchChatMessage(messages: Chat.RequestMessage[], uuid: number, i
     controller.signal)
 }
 
-async function onConversation() {
+async function handleSubmit() {
   const message = prompt.value
 
   if (loading.value)
@@ -111,13 +106,12 @@ async function onConversation() {
 
   if (!message || message.trim() === '')
     return
-
   addChat(
     +uuid,
     {
       dateTime: new Date().toLocaleString(),
       text: message,
-      inversion: true,
+      rule: ChatRule.User,
       error: false,
     },
   )
@@ -132,7 +126,7 @@ async function onConversation() {
       dateTime: new Date().toLocaleString(),
       text: '',
       loading: true,
-      inversion: false,
+      rule: ChatRule.Assistant,
       error: false,
     },
   )
@@ -158,7 +152,7 @@ async function onRegenerate(index: number) {
     {
       dateTime: new Date().toLocaleString(),
       text: '',
-      inversion: false,
+      rule: ChatRule.Assistant,
       error: false,
       loading: true,
     },
@@ -342,7 +336,7 @@ onUnmounted(() => {
                 :key="index"
                 :date-time="item.dateTime"
                 :text="item.text"
-                :inversion="item.inversion"
+                :is-bot="item.rule === ChatRule.Assistant"
                 :error="item.error"
                 :loading="item.loading"
                 @regenerate="onRegenerate(index)"

@@ -1,11 +1,10 @@
 declare namespace Chat {
-
 	// 一条聊天消息
 	interface Chat {
 		dateTime: string
 		text: string
 		tokenNum?: number
-		inversion?: boolean
+		rule: import("@/store").ChatRule
 		error?: boolean
 		loading?: boolean
 	}

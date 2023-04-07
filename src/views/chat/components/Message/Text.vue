@@ -7,7 +7,7 @@ import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { t } from '@/locales'
 
 interface Props {
-  inversion?: boolean
+  isBot?: boolean
   error?: boolean
   text?: string
   loading?: boolean
@@ -39,15 +39,15 @@ const wrapClass = computed(() => {
     'min-w-[20px]',
     'rounded-md',
     isMobile.value ? 'p-2' : 'px-3 py-2',
-    props.inversion ? 'bg-[#d2f9d1]' : 'bg-[#f4f6f8]',
-    props.inversion ? 'dark:bg-[#a1dc95]' : 'dark:bg-[#1e1e20]',
+    props.isBot ? 'bg-[#f4f6f8]' : 'bg-[#d2f9d1]',
+    props.isBot ? 'dark:bg-[#1e1e20]' : 'dark:bg-[#a1dc95]',
     { 'text-red-500': props.error },
   ]
 })
 
 const text = computed(() => {
   const value = props.text ?? ''
-  if (!props.inversion)
+  if (props.isBot)
     return mdi.render(value)
   return value
 })
@@ -66,7 +66,7 @@ defineExpose({ textRef })
     </template>
     <template v-else>
       <div ref="textRef" class="leading-relaxed break-words">
-        <div v-if="!inversion" class="markdown-body" v-html="text" />
+        <div v-if="isBot" class="markdown-body" v-html="text" />
         <div v-else class="whitespace-pre-wrap" v-text="text" />
       </div>
     </template>
