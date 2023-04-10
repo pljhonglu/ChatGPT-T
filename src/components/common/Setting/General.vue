@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { NButton, NPopconfirm, NSelect, useMessage } from 'naive-ui'
+import { NButton, NModal, NPopconfirm, NSelect, useMessage } from 'naive-ui'
 import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
 import { relaunch } from '@tauri-apps/api/process'
+import MarkdownIt from 'markdown-it'
 import type { Language, Theme } from '@/store/modules/app/helper'
 import { SvgIcon } from '@/components/common'
 import { useAppStore } from '@/store'
@@ -15,6 +16,10 @@ const { isMobile } = useBasicLayout()
 const ms = useMessage()
 
 const theme = computed(() => appStore.theme)
+
+const showDialog = ref<boolean>(false)
+const updateContent = ref<string>('')
+const updateLoading = ref<boolean>(false)
 
 const language = computed({
   get() {
@@ -54,25 +59,30 @@ function clearData(): void {
   location.reload()
 }
 
-const updateLoading = ref<boolean>(false)
-
 async function checkAppUpdate() {
   const update_info = await checkUpdate()
   if (update_info.shouldUpdate) {
-    try {
-      ms.info('发现新版本，正在更新...')
-      updateLoading.value = true
-      await installUpdate()
-      await relaunch()
-      updateLoading.value = false
-    }
-    catch (error) {
-      updateLoading.value = false
-      ms.error(error as string)
-    }
+    const featLog = update_info.manifest?.body
+    const md = new MarkdownIt()
+    const result = md.render(featLog || '')
+    updateContent.value = result
+    showDialog.value = true
   }
   else {
     ms.info('当前是最新版本！')
+  }
+}
+
+async function appInstallUpdate() {
+  try {
+    updateLoading.value = true
+    await installUpdate()
+    await relaunch()
+    updateLoading.value = false
+  }
+  catch (error) {
+    updateLoading.value = false
+    ms.error(error as string)
   }
 }
 </script>
@@ -130,7 +140,7 @@ async function checkAppUpdate() {
       <div class="flex items-center space-x-4">
         <span class="flex-shrink-0 w-[100px]">更新</span>
         <div class="flex flex-wrap items-center gap-4">
-          <NButton size="small" :loading="updateLoading" :disabled="updateLoading" @click="checkAppUpdate">
+          <NButton size="small" @click="checkAppUpdate">
             <template #icon>
               <SvgIcon icon="ri:download-2-fill" />
             </template>
@@ -140,4 +150,15 @@ async function checkAppUpdate() {
       </div>
     </div>
   </div>
+  <NModal
+    v-model:show="showDialog"
+    preset="dialog"
+    title="发现新版本"
+    negative-text="取消"
+    positive-text="立即更新"
+    :loading="updateLoading"
+    @positive-click="appInstallUpdate"
+  >
+    <div v-html="updateContent" />
+  </NModal>
 </template>
