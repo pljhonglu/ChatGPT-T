@@ -60,7 +60,7 @@ const rules: FormRules = {
       validator(rule: FormItemRule, value: string) {
         if (!value)
           return new Error('不能为空')
-        else if (!/^sk-\w+$/.test(value))
+        else if (!/^\w+-\w+$/.test(value))
           return new Error('请输入正确的api-key')
 
         return true
