@@ -88,7 +88,7 @@ const rules: FormRules = {
 function saveUserInfo() {
   formRef.value?.validate((errors) => {
     if (!errors) {
-      const hostUrl = new URL(userConfig.value.host)
+      const hostUrl = new URL(model.value.host)
 
       userInfo.value.name = model.value.name
       userInfo.value.avatar = model.value.avatar
