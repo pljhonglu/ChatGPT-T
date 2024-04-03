@@ -1,35 +1,35 @@
 {
-  "version": "v0.1.5",
-  "notes": "fix:\n- 修复host无法修改的问题\n\n\n## v0.1.5\n\nfeat:\n- 支持针对每个会话配置 prompt，可以定义自己的角色\n- 更新新版本时提示更新内容\n\nfix：\n- 调整host配置格式，只填写host，不填写url",
-  "pub_date": "2023-08-04T12:27:04.448Z",
+  "version": "v0.1.6",
+  "notes": "fix:\n- 修复关闭窗口时窗口最小化的问题\n- 填写api host 支持http链接，支持带端口号",
+  "pub_date": "2024-04-03T08:36:10.955Z",
   "platforms": {
     "win64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRUnJWeXgyU3FlTnAvaFNKaDF0Z0hVNXMvVzErdUxSNG1lb1JsWFFyQ0tmSTdIRTlMZkZYaGw0Q1l4VjVHZTgwUi9tdmxicjYrN0NmM0h5OUVucHNOcXZFTTBwYjZCTXdzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjkxMTUxOTg5CWZpbGU6Q2hhdEdQVC1UYXVyaV8wLjEuNV94NjRfZW4tVVMubXNpLnppcApRbk9EZGpiOXRubTZHTW5FVExEOSt0bjE0bDVJNS8wTDZyRGc1ZlExTFdpMUkrQitvZjZLb2hHbThFbDBQNERubGJSOWZNamNjZUY5aW0wcUpmRXNBZz09Cg==",
-      "url": "https://github.com/pljhonglu/ChatGPT-T/releases/download/v0.1.5/ChatGPT-Tauri_0.1.5_x64_en-US.msi.zip"
+      "signature": "",
+      "url": ""
     },
     "linux": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRUnJWeXgyU3FlTnBQVXpkWUlTRDVhMGk1SWhGS2trTXZhVjFWTGttYnc1MEkvY1VTaVpGWG1WTm53R0xlT2JQMC9wWG5RL1IvdUtlckVFd0d0U1hzMnp4VlF0NWs4ZkFNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjkxMTUxOTQ4CWZpbGU6Y2hhdC1ncHQtdGF1cmlfMC4xLjVfYW1kNjQuQXBwSW1hZ2UudGFyLmd6CitISE5IM0dQWW9GbDFmTGhnTUZ2TkpuUFBocmdwSFNBTGJGdVpPYkNvd254bzBhSzBqK2gxQ1AvT2RjVWI2aEpVWk5oVmNZZCtST1o1RkNsdE9zSUFRPT0K",
-      "url": "https://github.com/pljhonglu/ChatGPT-T/releases/download/v0.1.5/chat-gpt-tauri_0.1.5_amd64.AppImage.tar.gz"
+      "signature": "",
+      "url": ""
     },
     "darwin": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRUnJWeXgyU3FlTnQvcEdtZ0dmUGpmR2hYMmpqZzlsSFE1bmtFUmVmUUQ0NlhyTjZ5VGhpZ043NkxraktjVUlpdU5na0wwMWEwbVhST2F2aXZpdE9raG90Y01xM1NPT3dJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjkxMTUxODE0CWZpbGU6Q2hhdEdQVC1UYXVyaS5hcHAudGFyLmd6Cm5OUWprc3E0Sm4vNTZmVVRrMm9XWXZqa29QbVprc3V3ZXc2MFhmOVRtVnR3aFlxNWtxbE5wRWNsQ1VXajQ5VnQxdjFEMkNSV014M21HQm92VlpVYUJBPT0K",
-      "url": "https://github.com/pljhonglu/ChatGPT-T/releases/download/v0.1.5/ChatGPT-Tauri_x64.app.tar.gz"
+      "signature": "",
+      "url": ""
     },
     "darwin-aarch64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRUnJWeXgyU3FlTm9qeWtRU3hZbzFlRkpFRUU5YWl6T2ptaURCdk1wczJsRGJEbkpaZnM3cU03aWVtUUtOVTJVUkd0NlhISUxrY1hXckhsckJ0TDFRSU1maUNWN2ZLOXdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjkxMTUxNzMwCWZpbGU6Q2hhdEdQVC1UYXVyaS5hcHAudGFyLmd6CkxMTHAxNXh4NzBUbnMrd1dlNXJNVXRJMWhBSVNWWG5VczJKZkx0UVM3a1dtc3JoNWpCYU9YdnlmS25JMmVyTTFXZlhUTWJwQkYybTJYb0F0M0lHQ0FRPT0K",
-      "url": "https://github.com/pljhonglu/ChatGPT-T/releases/download/v0.1.5/ChatGPT-Tauri_aarch64.app.tar.gz"
+      "signature": "",
+      "url": ""
     },
     "darwin-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRUnJWeXgyU3FlTnQvcEdtZ0dmUGpmR2hYMmpqZzlsSFE1bmtFUmVmUUQ0NlhyTjZ5VGhpZ043NkxraktjVUlpdU5na0wwMWEwbVhST2F2aXZpdE9raG90Y01xM1NPT3dJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjkxMTUxODE0CWZpbGU6Q2hhdEdQVC1UYXVyaS5hcHAudGFyLmd6Cm5OUWprc3E0Sm4vNTZmVVRrMm9XWXZqa29QbVprc3V3ZXc2MFhmOVRtVnR3aFlxNWtxbE5wRWNsQ1VXajQ5VnQxdjFEMkNSV014M21HQm92VlpVYUJBPT0K",
-      "url": "https://github.com/pljhonglu/ChatGPT-T/releases/download/v0.1.5/ChatGPT-Tauri_x64.app.tar.gz"
+      "signature": "",
+      "url": ""
     },
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRUnJWeXgyU3FlTnBQVXpkWUlTRDVhMGk1SWhGS2trTXZhVjFWTGttYnc1MEkvY1VTaVpGWG1WTm53R0xlT2JQMC9wWG5RL1IvdUtlckVFd0d0U1hzMnp4VlF0NWs4ZkFNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjkxMTUxOTQ4CWZpbGU6Y2hhdC1ncHQtdGF1cmlfMC4xLjVfYW1kNjQuQXBwSW1hZ2UudGFyLmd6CitISE5IM0dQWW9GbDFmTGhnTUZ2TkpuUFBocmdwSFNBTGJGdVpPYkNvd254bzBhSzBqK2gxQ1AvT2RjVWI2aEpVWk5oVmNZZCtST1o1RkNsdE9zSUFRPT0K",
-      "url": "https://github.com/pljhonglu/ChatGPT-T/releases/download/v0.1.5/chat-gpt-tauri_0.1.5_amd64.AppImage.tar.gz"
+      "signature": "",
+      "url": ""
     },
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRUnJWeXgyU3FlTnAvaFNKaDF0Z0hVNXMvVzErdUxSNG1lb1JsWFFyQ0tmSTdIRTlMZkZYaGw0Q1l4VjVHZTgwUi9tdmxicjYrN0NmM0h5OUVucHNOcXZFTTBwYjZCTXdzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNjkxMTUxOTg5CWZpbGU6Q2hhdEdQVC1UYXVyaV8wLjEuNV94NjRfZW4tVVMubXNpLnppcApRbk9EZGpiOXRubTZHTW5FVExEOSt0bjE0bDVJNS8wTDZyRGc1ZlExTFdpMUkrQitvZjZLb2hHbThFbDBQNERubGJSOWZNamNjZUY5aW0wcUpmRXNBZz09Cg==",
-      "url": "https://github.com/pljhonglu/ChatGPT-T/releases/download/v0.1.5/ChatGPT-Tauri_0.1.5_x64_en-US.msi.zip"
+      "signature": "",
+      "url": ""
     }
   }
 }
