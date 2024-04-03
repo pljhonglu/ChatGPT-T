@@ -1,7 +1,7 @@
 {
   "version": "v0.1.6",
   "notes": "fix:\n- 修复关闭窗口时窗口最小化的问题\n- 填写api host 支持http链接，支持带端口号",
-  "pub_date": "2024-04-03T08:36:10.955Z",
+  "pub_date": "2024-04-03T08:47:08.739Z",
   "platforms": {
     "win64": {
       "signature": "",
