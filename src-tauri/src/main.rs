@@ -46,17 +46,18 @@ fn main() {
 
   #[cfg(target_os = "macos")]
   {
-    builder = builder.on_window_event(move |event| {
-      if let tauri::WindowEvent::CloseRequested { api, .. } = event.event() {
+    builder = builder.on_window_event(|event| match event.event() {
+      tauri::WindowEvent::CloseRequested { api, .. } => {
         let win = event.window().clone();
         if win.label() == "core" {
-          win.minimize().unwrap();
+          tauri::AppHandle::hide(&event.window().app_handle()).unwrap();
         }else {
           cmd::window::window_reload(event.window().app_handle(), "core");
           event.window().close().unwrap();
         }
         api.prevent_close();
       }
+      _ => {}
     })
   }
   

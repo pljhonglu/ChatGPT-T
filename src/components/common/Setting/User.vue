@@ -75,7 +75,7 @@ const rules: FormRules = {
       validator(rule: FormItemRule, value: string) {
         if (!value)
           return new Error('不能为空')
-        else if (!/^https:\/\/([a-z0-9\-]+\.)+[a-z]{2,}$/i.test(value))
+        else if (!/^(http|https):\/\/[^ "]+(:\d+)?$/i.test(value))
           return new Error('请输入正确的host')
 
         return true
